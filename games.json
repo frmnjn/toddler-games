@@ -1,0 +1,18 @@
+{
+  "games": [
+    {
+      "id": "ant-smasher",
+      "title": "Alana's Ant Garden",
+      "description": "Tap the ants in a sunny garden.",
+      "icon": "ant-smasher/icon-192.png",
+      "url": "ant-smasher/"
+    },
+    {
+      "id": "shape-sorter",
+      "title": "Alana's Shape Garden",
+      "description": "Tap the friendly shapes.",
+      "icon": "shape-sorter/icon-192.png",
+      "url": "shape-sorter/"
+    }
+  ]
+}

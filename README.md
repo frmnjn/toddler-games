@@ -1,0 +1,66 @@
+# Games — frmnjn.my.id
+
+Kumpulan game web sederhana (static, vanilla HTML/CSS/JS) yang dibuat untuk anak kecil (toddler). Semua game berjalan penuh di browser — tanpa framework, tanpa build step. Tinggal di-deploy ke static host apa pun.
+
+## Struktur
+
+```
+games/
+├── index.html        # Halaman utama / launcher — render kartu game dari games.json
+├── games.json        # Registry game (id, title, description, icon, url)
+├── ant-smasher/      # "Alana's Ant Garden"
+│   ├── index.html    # Game: tap semut yang bergerak di taman
+│   ├── manifest.json # PWA manifest
+│   ├── sw.js         # Service worker (offline / cache)
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   ├── v1/           # Snapshot versi lama (backup)
+│   └── v2/           # Snapshot versi lama (backup)
+└── shape-sorter/     # "Alana's Shape Garden"
+    ├── index.html    # Game: tap bentuk, muncul nama bentuknya (ID/EN)
+    ├── manifest.json # PWA manifest
+    ├── sw.js         # Service worker (offline / cache)
+    ├── icon-192.png
+    └── icon-512.png
+```
+
+## Cara deploy
+
+Project ini 100% static. Cukup upload seluruh isi folder ke static host apa pun (GitHub Pages, Netlify, Vercel, Nginx, dll).
+
+Tidak ada build step — file langsung bisa di-serve.
+
+## Game
+
+### Alana's Ant Garden (`ant-smasher/`)
+
+Game tap santai tanpa skor. Semut berjalan & memantul di dalam area; tap untuk "pop" dengan efek suara *chime*. Setiap beberapa tap muncul *sticker* emoji di atas.
+
+- Ada semut **golden** langka (~7%) dengan suara spesial.
+- **Musik latar** digenerate di browser via Web Audio (tanpa file/sample → bebas lisensi).
+- Tombol **fullscreen / kiosk** agar anak tidak sengaja keluar dari app.
+- Tombol **suara** untuk on/off musik & efek.
+
+### Alana's Shape Garden (`shape-sorter/`)
+
+Tap bentuk ramah (lingkaran, kotak, segitiga, bintang, hati) yang muncul berwarna-warni; bentuk "pop" dan **mengucapkan nama bentuknya** (via Web Speech API).
+
+- **Pilih bahasa dulu** di awal: 🇮🇩 Bahasa Indonesia atau 🇺🇸 English.
+  - Nama bentuk yang diucapkan & ditampilkan ikut bahasa yang dipilih (`id-ID` untuk ID, `en-US` untuk EN).
+  - Tombol **🌐** di dalam game untuk ganti bahasa kapan saja.
+- Tidak ada skor / angka agar fokus ke sebab-akibat untuk anak.
+- Musik latar & efek suara digenerate di browser (bebas lisensi).
+
+## PWA & offline
+
+Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
+
+Catatan: halaman launcher (`index.html`) **belum** punya manifest/offline sendiri — hanya game per individunya.
+
+## Teknis
+
+- Bahasa UI halaman utama & hint sebagian besar dalam **Bahasa Indonesia** (`lang="id"`).
+- Audio (efek + musik) disintesis dengan Web Audio API — tidak ada file audio.
+- Game state ringan (DOM + `requestAnimationFrame`), cocok untuk perangkat mobile.
+
+Icons & title disesuaikan untuk anak; project ini bersifat pribadi/keluarga.

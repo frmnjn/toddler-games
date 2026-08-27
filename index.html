@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Games — frmnjn.my.id</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:linear-gradient(180deg,#8ed6ff 0%,#b9e879 100%);
+    font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding:32px 16px 60px}
+  h1{text-align:center;color:#3a2b1a;font-size:clamp(24px,6vw,34px);margin:12px 0 6px}
+  p.sub{text-align:center;color:#4a3a26;opacity:.75;margin:0 0 32px;font-size:14px}
+  #grid{max-width:720px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:18px}
+  a.card{display:flex;flex-direction:column;align-items:center;text-align:center;text-decoration:none;
+    background:rgba(255,255,255,.92);border-radius:20px;padding:18px 14px;box-shadow:0 6px 18px #0002;
+    transition:transform .15s, box-shadow .15s}
+  a.card:active{transform:scale(.96)}
+  a.card img{width:72px;height:72px;border-radius:16px;margin-bottom:10px;box-shadow:0 3px 8px #0002}
+  a.card .title{font-weight:800;color:#3a2b1a;font-size:15px;margin-bottom:4px}
+  a.card .desc{font-size:12px;color:#5a4a36;opacity:.8;line-height:1.3}
+  #empty,#err{text-align:center;color:#4a3a26;opacity:.7;margin-top:40px}
+</style>
+</head>
+<body>
+  <h1>🎮 Games</h1>
+  <p class="sub">Pilih game buat main</p>
+  <div id="grid"></div>
+  <div id="empty" style="display:none">Belum ada game.</div>
+  <div id="err" style="display:none">Gagal memuat daftar game.</div>
+
+<script>
+fetch('games.json', {cache:'no-store'})
+  .then(r => r.json())
+  .then(data => {
+    const grid = document.getElementById('grid');
+    const list = data.games || [];
+    if (!list.length) { document.getElementById('empty').style.display='block'; return; }
+    list.forEach(g => {
+      const a = document.createElement('a');
+      a.className = 'card';
+      a.href = g.url;
+      a.innerHTML = `
+        <img src="${g.icon}" alt="" onerror="this.style.display='none'">
+        <div class="title">${g.title}</div>
+        <div class="desc">${g.description || ''}</div>
+      `;
+      grid.appendChild(a);
+    });
+  })
+  .catch(() => { document.getElementById('err').style.display='block'; });
+</script>
+</body>
+</html>

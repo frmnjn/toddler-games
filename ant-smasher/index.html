@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Alana's Ant Garden</title>
+<meta name="theme-color" content="#8ed6ff">
+<meta name="description" content="Tap the ants in a sunny garden — endless, chill, no rules.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ant Garden">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#8ed6ff;font-family:system-ui,-apple-system,Segoe UI,sans-serif;overscroll-behavior:none}
+  body{touch-action:none}
+  #game{position:fixed;inset:0;overflow:hidden;background:
+    linear-gradient(#8ed6ff 0 43%,#b9e879 43% 100%)}
+  #sun{position:absolute;right:7vw;top:5vh;width:72px;height:72px;border-radius:50%;
+    background:#ffe27a;box-shadow:0 0 35px #fff2a8}
+  .cloud{position:absolute;width:130px;height:35px;background:#fff;border-radius:30px;opacity:.75}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud:before{width:52px;height:52px;left:20px;bottom:5px}
+  .cloud:after{width:65px;height:65px;right:18px;bottom:2px}
+  .c1{left:7vw;top:12vh}.c2{left:55vw;top:22vh;transform:scale(.7)}
+  #hud{position:absolute;z-index:20;left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 16px 0;
+    display:flex;justify-content:center;align-items:center;gap:6px;pointer-events:none;font-size:22px;
+    filter:drop-shadow(0 2px 4px #0002)}
+  #hud span{transition:transform .3s;display:inline-block}
+  #hud span.pop-in{animation:stickerPop .4s ease-out}
+  @keyframes stickerPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+  #parentBtns{position:absolute;z-index:25;top:max(10px,env(safe-area-inset-top));right:14px;
+    display:flex;gap:8px}
+  #soundBtn,#fsBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+    font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:.55}
+  .ant{position:absolute;width:100px;height:100px;z-index:10;transform-origin:center;
+    cursor:pointer}
+  .ant .visual{position:absolute;left:14px;top:14px;width:72px;height:72px;filter:drop-shadow(0 5px 3px #0003)}
+  .ant.flip .visual{transform:scaleX(-1)}
+  .ant.golden .body,.ant.golden .head,.ant.golden .rear{background:#caa23a}
+  .ant.golden .visual{filter:drop-shadow(0 0 10px #ffdd6688) drop-shadow(0 5px 3px #0003)}
+  .ant .body{position:absolute;width:30px;height:38px;border-radius:50%;background:#33221c;left:25px;top:22px}
+  .ant .head{position:absolute;width:29px;height:29px;border-radius:50%;background:#2b1d18;left:8px;top:20px}
+  .ant .rear{position:absolute;width:32px;height:35px;border-radius:50%;background:#3b251d;left:43px;top:23px}
+  .ant .eye{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;left:15px;top:27px}
+  .ant .eye2{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff;left:25px;top:27px}
+  .ant .leg{position:absolute;width:26px;height:4px;background:#2b1d18;border-radius:4px;transform-origin:left center}
+  .ant .l1{left:25px;top:30px;transform:rotate(150deg)}.ant .l2{left:27px;top:39px;transform:rotate(170deg)}
+  .ant .l3{left:42px;top:30px;transform:rotate(30deg)}.ant .l4{left:43px;top:40px;transform:rotate(10deg)}
+  .ant .leg.l5{left:34px;top:54px;transform:rotate(105deg)}.ant .leg.l6{left:46px;top:54px;transform:rotate(75deg)}
+  .ant .antenna{position:absolute;width:20px;height:3px;background:#2b1d18;left:10px;top:21px;transform:rotate(-28deg);border-radius:3px}
+  .ant .antenna.a2{left:20px;top:18px;transform:rotate(-55deg)}
+  .pop{position:absolute;z-index:30;font-weight:900;font-size:28px;color:#fff;text-shadow:0 2px 4px #0008;
+    animation:pop .55s ease-out forwards;pointer-events:none}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}25%{transform:scale(1.3);opacity:1}100%{transform:translateY(-50px) scale(1);opacity:0}}
+  .flower{position:absolute;font-size:38px;opacity:.9;pointer-events:none}
+  #hint{position:absolute;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;color:#5a3b20;font-weight:700;
+    font-size:15px;white-space:nowrap;box-shadow:0 3px 12px #0002;transition:opacity .5s}
+</style>
+</head>
+<body>
+<div id="game">
+  <div id="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+  <div class="flower" style="left:8%;bottom:7%">🌼</div>
+  <div class="flower" style="left:82%;bottom:10%">🌸</div>
+  <div class="flower" style="left:45%;bottom:4%">🌷</div>
+  <div id="hud"></div>
+  <div id="parentBtns">
+    <button id="fsBtn" aria-label="Fullscreen">⛶</button>
+    <button id="soundBtn" aria-label="Toggle music">🔊</button>
+  </div>
+  <div id="hint">👆 Tap the ants!</div>
+</div>
+<script>
+(() => {
+  const game=document.getElementById('game'), hud=document.getElementById('hud'),
+        soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
+        hint=document.getElementById('hint');
+  let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false;
+  let tapsSinceSticker=0;
+  const stickers=['🐜','🌸','🦋','⭐','🌼'];
+  const ants=new Set();
+
+  /* No visible score, no combo counter, no numbers at all — just cause-and-effect */
+  /* fun for a toddler. Every few taps a little sticker pops into the row up top. */
+  function addSticker(emoji){
+    const s=document.createElement('span'); s.textContent=emoji; s.className='pop-in';
+    hud.appendChild(s);
+    if(hud.children.length>10) hud.removeChild(hud.firstChild);
+  }
+
+  /* ---------- sound effects ---------- */
+  function sound(freq,dur=.07,type='sine',vol=.045){
+    if(!musicOn) return;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=freq; o.type=type; g.gain.setValueAtTime(vol,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+      o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur);
+    }catch(e){}
+  }
+
+  /* Cheerful little rising 3-note giggle whenever an ant is tapped — friendlier */
+  /* for a 2-year-old than a single beep. Golden ants get a brighter sparkle chime. */
+  function chime(isGolden){
+    if(!musicOn) return;
+    const notes = isGolden ? [660,880,1100] : [440+Math.random()*80, 560+Math.random()*80, 700+Math.random()*80];
+    notes.forEach((f,i)=>setTimeout(()=>sound(f, isGolden?0.14:0.1, isGolden?'triangle':'sine', isGolden?0.06:0.04), i*55));
+  }
+
+  /* ---------- generative, royalty-free background music ---------- */
+  /* Everything below is synthesized in-browser via Web Audio oscillators — */
+  /* no audio files, no samples, so there's nothing to license. */
+  let musicGain=null, nextNoteTime=0, schedulerId=null;
+  const scale=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25]; // C major pentatonic-ish, garden-friendly
+  let beat=0;
+
+  function initMusic(){
+    if(musicStarted) return;
+    musicStarted=true;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      musicGain=audioCtx.createGain();
+      musicGain.gain.value=musicOn?0.09:0;
+      const filter=audioCtx.createBiquadFilter();
+      filter.type='lowpass'; filter.frequency.value=2200;
+      musicGain.connect(filter); filter.connect(audioCtx.destination);
+      nextNoteTime=audioCtx.currentTime+0.1;
+      scheduler();
+    }catch(e){}
+  }
+
+  function playNote(freq,time,dur,type,vol){
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,time);
+    g.gain.linearRampToValueAtTime(vol,time+0.04);
+    g.gain.exponentialRampToValueAtTime(0.0005,time+dur);
+    o.connect(g); g.connect(musicGain);
+    o.start(time); o.stop(time+dur+0.05);
+  }
+
+  function scheduleBeat(){
+    const t=nextNoteTime;
+    // soft pad chord every 4 beats (root + fifth)
+    if(beat%4===0){
+      const root=scale[0]/2;
+      playNote(root,t,1.8,'triangle',0.5);
+      playNote(root*1.5,t,1.8,'triangle',0.35);
+    }
+    // light melody note, mostly on-beat, occasionally skipped for breathing room
+    if(Math.random()<0.8){
+      const note=scale[Math.floor(Math.random()*scale.length)];
+      playNote(note,t+ (Math.random()<0.3?0.2:0),0.9,'sine',0.55);
+    }
+    beat++;
+    nextNoteTime+=0.85;
+  }
+
+  function scheduler(){
+    if(!audioCtx) return;
+    while(nextNoteTime<audioCtx.currentTime+0.6){ scheduleBeat(); }
+    schedulerId=setTimeout(scheduler,150);
+  }
+
+  function setMusicEnabled(on){
+    musicOn=on;
+    soundBtn.textContent=on?'🔊':'🔇';
+    if(musicGain) musicGain.gain.setTargetAtTime(on?0.09:0, audioCtx.currentTime, 0.15);
+  }
+
+  soundBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    initMusic();
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    setMusicEnabled(!musicOn);
+  });
+
+  /* ---------- fullscreen / kiosk mode ---------- */
+  /* Keeps a toddler from accidentally swiping/backing out of the app mid-play. */
+  function goFullscreen(){
+    try{
+      const el=document.documentElement;
+      if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    }catch(e){}
+  }
+  function updateFsBtn(){
+    fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶';
+  }
+  fsBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    if(document.fullscreenElement){ try{document.exitFullscreen();}catch(err){} }
+    else goFullscreen();
+  });
+  document.addEventListener('fullscreenchange',updateFsBtn);
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  });
+
+  /* ---------- gameplay ---------- */
+  function spawn(){
+    const isGolden=Math.random()<0.07;
+    const el=document.createElement('div'); el.className='ant'+(isGolden?' golden':'');
+    if(isGolden) el.dataset.golden='1';
+    if(Math.random()<.5) el.classList.add('flip');
+    el.innerHTML=`<div class="visual">
+      <div class="antenna"></div><div class="antenna a2"></div>
+      <div class="head"></div><div class="body"></div><div class="rear"></div>
+      <div class="eye"></div><div class="eye2"></div>
+      <div class="leg l1"></div><div class="leg l2"></div><div class="leg l3"></div>
+      <div class="leg l4"></div><div class="leg l5"></div><div class="leg l6"></div>
+    </div>`;
+    const w=innerWidth,h=innerHeight;
+    const x=4+Math.random()*(w-108), y=Math.max(h*.40,60)+Math.random()*(h*.5-100);
+    el.style.left=x+'px'; el.style.top=y+'px';
+    el.dataset.x=x; el.dataset.y=y;
+    el.dataset.vx=(Math.random()-.5)*0.55; el.dataset.vy=(Math.random()-.5)*0.35;
+    el.addEventListener('pointerdown',e=>{
+      e.preventDefault(); e.stopPropagation();
+      initMusic();
+      if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+      if(!ants.has(el))return;
+      ants.delete(el); el.remove();
+
+      chime(isGolden);
+      tapsSinceSticker++;
+      if(isGolden || tapsSinceSticker>=3){
+        addSticker(stickers[Math.floor(Math.random()*stickers.length)]);
+        tapsSinceSticker=0;
+      }
+      pop(el.dataset.x,el.dataset.y,isGolden);
+    },{passive:false});
+    game.appendChild(el); ants.add(el);
+  }
+  function pop(x,y,isGolden){
+    const p=document.createElement('div');p.className='pop';p.textContent=isGolden?'⭐':'✨';
+    p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
+    setTimeout(()=>p.remove(),600);
+  }
+  function loop(t){
+    if(t-lastSpawn>900 && ants.size<7){spawn();lastSpawn=t;}
+    ants.forEach(el=>{
+      let x=parseFloat(el.dataset.x)+parseFloat(el.dataset.vx);
+      let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.vy);
+      const maxX=innerWidth-104,maxY=innerHeight-115,minY=innerHeight*.41;
+      if(x<4||x>maxX) el.dataset.vx=(-parseFloat(el.dataset.vx));
+      if(y<minY||y>maxY) el.dataset.vy=(-parseFloat(el.dataset.vy));
+      x=Math.max(4,Math.min(maxX,x)); y=Math.max(minY,Math.min(maxY,y));
+      el.dataset.x=x;el.dataset.y=y;el.style.left=x+'px';el.style.top=y+'px';
+    });
+    requestAnimationFrame(loop);
+  }
+  game.addEventListener('pointerdown',()=>{ initMusic(); goFullscreen(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); sound(260,.035); },{passive:true});
+  setTimeout(()=>hint.style.opacity='0',3500);
+  for(let i=0;i<3;i++) setTimeout(spawn,i*450);
+  requestAnimationFrame(loop);
+
+  /* ---------- PWA service worker ---------- */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>
