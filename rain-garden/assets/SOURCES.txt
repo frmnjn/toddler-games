@@ -1,0 +1,11 @@
+Raindrop splash sound effects
+================================
+- drop.mp3      = Splash, small pre-splash (#1534)
+- drop-big.mp3  = Splash, Big #1 (#1519)
+
+Source: BigSoundBank (LaSonotheque) - https://bigsoundbank.com
+License: CC0 / public-domain-equivalent. Free for commercial use, no attribution required.
+
+Direct file URLs:
+  https://bigsoundbank.com/UPLOAD/mp3/1534.mp3
+  https://bigsoundbank.com/UPLOAD/mp3/1519.mp3

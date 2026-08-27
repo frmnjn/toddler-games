@@ -27,7 +27,8 @@ games/
     ├── manifest.json # PWA manifest
     ├── sw.js         # Service worker (offline / cache)
     ├── icon-192.png
-    └── icon-512.png
+    ├── icon-512.png
+    └── assets/       # SFX raindrop (CC0 — lihat SOURCES.txt)
 ```
 
 ## Cara deploy
@@ -65,7 +66,8 @@ Suasana hujan yang tenang. Tetesan hujan jatuh lurus dari atas; tap tetesan → 
   - Saat tap, mengucapkan kata ("hujan"/"rain") sesuai bahasa yang dipilih.
   - Tombol **🌐** di dalam game untuk ganti bahasa kapan saja.
 - Tidak ada skor / angka — fokus sensori visual + suara.
-- Musik latar & efek suara digenerate di browser (bebas lisensi).
+- Suara percikan tetesan pakai **SFX asli** (CC0, lisensi bebas komersial, sumber BigSoundBank — lihat `rain-garden/assets/SOURCES.txt`), diputar via Web Audio; fallback ke sintesis jika gagal dimuat.
+- Musik latar digenerate di browser (bebas lisensi).
 
 ## PWA & offline
 

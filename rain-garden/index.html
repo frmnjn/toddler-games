@@ -121,13 +121,42 @@
     }catch(e){}
   }
 
-  /* Soft descending "plip" — like a raindrop landing. */
-  function plip(){
-    if(!musicOn) return;
-    const base=620+Math.random()*120;
-    sound(base,.09,'sine',.05);
-    setTimeout(()=>sound(base*0.7,.12,'sine',.04),60);
+  /* Real raindrop splashes (CC0 via BigSoundBank / LaSonotheque), played
+     through Web Audio for low-latency repeats. Falls back to a synthesized
+     "plip" if the file can't be loaded or decoded. */
+  let dropBuf=null, dropBigBuf=null, dropLoaded=false;
+  function preloadDrop(){
+    if(dropLoaded || !audioCtx) return;
+    dropLoaded=true;
+    const srcs=[[ 'assets/drop.mp3', b=>dropBuf=b ], [ 'assets/drop-big.mp3', b=>dropBigBuf=b ]];
+    srcs.forEach(([url,set])=>{
+      fetch(url).then(r=>{ if(!r.ok) throw 0; return r.arrayBuffer(); })
+        .then(buf=>audioCtx.decodeAudioData(buf)).then(b=>set(b)).catch(()=>{});
+    });
   }
+  function playDrop(isBig){
+    if(!musicOn) return;
+    const buf = isBig ? dropBigBuf : dropBuf;
+    try{
+      if(buf){
+        audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+        const src=audioCtx.createBufferSource(), g=audioCtx.createGain();
+        src.buffer=buf;
+        g.gain.value=isBig?0.5:0.32;
+        src.connect(g); g.connect(audioCtx.destination);
+        src.start();
+        return;
+      }
+    }catch(e){}
+    plipSynth(isBig);
+  }
+  /* Soft descending "plip" fallback — like a raindrop landing. */
+  function plipSynth(isBig){
+    const base=isBig?520:620+Math.random()*120;
+    sound(base,.09,'sine',isBig?.07:.05);
+    setTimeout(()=>sound(base*0.7,.12,'sine',isBig?.06:.04),60);
+  }
+  function plip(isBig){ playDrop(!!isBig); }
 
   /* Gently speaks a word in the chosen language. */
   function warmUpSpeech(){
@@ -169,6 +198,7 @@
     musicStarted=true;
     try{
       audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      preloadDrop();
       musicGain=audioCtx.createGain();
       musicGain.gain.value=musicOn?0.09:0;
       const filter=audioCtx.createBiquadFilter();
@@ -256,7 +286,7 @@
       if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
       drops.delete(el);
       const dx=parseFloat(el.dataset.x)+15, dy=parseFloat(el.dataset.y)+15;
-      plip();
+      plip(el.classList.contains('big'));
       speakWord(LANG[lang].word);
       splish(dx, dy);
       tapsSinceSticker++;
