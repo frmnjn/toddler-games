@@ -13,6 +13,13 @@
       "description": "Tap the friendly shapes.",
       "icon": "shape-sorter/icon-192.png",
       "url": "shape-sorter/"
+    },
+    {
+      "id": "rain-garden",
+      "title": "Alana's Rain Garden",
+      "description": "Tap the falling raindrops.",
+      "icon": "rain-garden/icon-192.png",
+      "url": "rain-garden/"
     }
   ]
 }

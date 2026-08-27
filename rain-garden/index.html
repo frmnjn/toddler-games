@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Alana's Rain Garden</title>
+<meta name="theme-color" content="#b8d4ee">
+<meta name="description" content="Tap the falling raindrops in a gentle rain — endless, chill, no rules.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rain Garden">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#b8d4ee;font-family:system-ui,-apple-system,Segoe UI,sans-serif;overscroll-behavior:none}
+  body{touch-action:none}
+  #game{position:fixed;inset:0;overflow:hidden;background:
+    linear-gradient(#cfe4f5 0 46%,#eef7e3 46% 62%,#b4d9a6 62% 100%)}
+  .cloud{position:absolute;width:130px;height:35px;background:#f4f9fe;border-radius:30px;opacity:.9;pointer-events:none}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:#f4f9fe;border-radius:50%}
+  .cloud:before{width:52px;height:52px;left:20px;bottom:5px}
+  .cloud:after{width:65px;height:65px;right:18px;bottom:2px}
+  .c1{left:6vw;top:7vh}.c2{left:55vw;top:11vh;transform:scale(.7)}
+  #ground{position:absolute;left:0;right:0;bottom:0;height:20%;pointer-events:none}
+  #hud{position:absolute;z-index:20;left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 16px 0;
+    display:flex;justify-content:center;align-items:center;gap:6px;pointer-events:none;font-size:22px;
+    filter:drop-shadow(0 2px 4px #0002)}
+  #hud span{transition:transform .3s;display:inline-block}
+  #hud span.pop-in{animation:stickerPop .4s ease-out}
+  @keyframes stickerPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+  #parentBtns{position:absolute;z-index:25;top:max(10px,env(safe-area-inset-top));right:14px;
+    display:flex;gap:8px}
+  #soundBtn,#fsBtn,#langBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+    font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:.55}
+  .drop{position:absolute;z-index:10;cursor:pointer}
+  .drop .drop-visual{width:34px;height:44px;position:relative;filter:drop-shadow(0 6px 4px #0001)}
+  .drop .d-upper{position:absolute;left:5px;top:0;width:24px;height:24px;border-radius:50%;background:#5a9bd8}
+  .drop .d-tail{position:absolute;left:8px;top:18px;width:18px;height:24px;border-radius:0 0 50% 50%;background:#5a9bd8}
+  .drop.big{transform:scale(1.5)}
+  .drop.big .d-upper,.drop.big .d-tail{background:#6db3e8}
+  .drop.tiny{transform:scale(.75)}
+  .drop.tiny .d-upper,.drop.tiny .d-tail{background:#8cc0ec}
+  .pop{position:absolute;z-index:30;font-weight:900;font-size:26px;color:#fff;text-shadow:0 2px 4px #0005;
+    animation:pop .55s ease-out forwards;pointer-events:none;white-space:nowrap}
+  @keyframes pop{0%{transform:scale(.5) translateY(0);opacity:0}25%{transform:scale(1.25) translateY(0);opacity:1}100%{transform:scale(1) translateY(-40px);opacity:0}}
+  .splash{position:absolute;z-index:12;pointer-events:none;width:26px;height:6px;border-radius:50%;
+    background:repeating-linear-gradient(90deg,#9cc8ec 0 6px,transparent 6px 14px);opacity:.8}
+  #hint{position:absolute;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;color:#3a5a7a;font-weight:700;
+    font-size:15px;white-space:nowrap;box-shadow:0 3px 12px #0002;transition:opacity .5s}
+  #langScreen{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 0%, #e6f2fb 0%, #cfe4f5 55%, #b8d4ee 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #langScreen .lang-title{font-size:clamp(24px,6vw,34px);font-weight:900;color:#2f4a66;margin:0 0 6px}
+  #langScreen .lang-sub{font-size:16px;color:#3c5a78;opacity:.85;margin:0 0 32px}
+  #langBtns{display:flex;flex-direction:column;gap:16px;width:min(280px,78vw)}
+  .langBtn{padding:18px;font-size:20px;font-weight:800;border:none;border-radius:20px;cursor:pointer;
+    background:#fff;color:#2f4a66;box-shadow:0 6px 18px #0002;display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:transform .15s}
+  .langBtn:active{transform:scale(.96)}
+  .langBtn .flag{font-size:26px}
+  @keyframes drift{from{transform:translateX(-18vw) scale(var(--sc,1))}to{transform:translateX(118vw) scale(var(--sc,1))}}
+  .cloud{animation:drift linear infinite}
+  .c1{--sc:1;animation-duration:26s}.c2{--sc:.7;animation-duration:34s}
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="cloud c1"></div><div class="cloud c2"></div>
+  <div id="ground"></div>
+  <div id="hud"></div>
+  <div id="parentBtns">
+    <button id="langBtn" aria-label="Change language">🌐</button>
+    <button id="fsBtn" aria-label="Fullscreen">⛶</button>
+    <button id="soundBtn" aria-label="Toggle sound">🔊</button>
+  </div>
+  <div id="hint">👆 Tap a drop!</div>
+</div>
+<div id="langScreen">
+  <div class="lang-title">🌧️ Alana's Rain Garden</div>
+  <div class="lang-sub" data-key="pick">Pilih bahasa / Choose language</div>
+  <div id="langBtns">
+    <button class="langBtn" data-lang="id"><span class="flag">🇮🇩</span> Bahasa Indonesia</button>
+    <button class="langBtn" data-lang="en"><span class="flag">🇺🇸</span> English</button>
+  </div>
+</div>
+<script>
+(() => {
+  const game=document.getElementById('game'), hud=document.getElementById('hud'),
+        soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
+        langBtn=document.getElementById('langBtn'), langScreen=document.getElementById('langScreen'),
+        hint=document.getElementById('hint');
+  let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false, lastFall=0;
+  let tapsSinceSticker=0;
+  let lang='id', started=false;
+  const LANG={
+    id:{ langTag:'id-ID', hint:'👆 Ketuk airnya!', pick:'Pilih bahasa', word:'hujan' },
+    en:{ langTag:'en-US', hint:'👆 Tap a drop!',  pick:'Choose language', word:'rain' }
+  };
+  const stickers=['💧','🌈','☔','🌦️','🌿','🐸'];
+  const drops=new Set();
+
+  function addSticker(emoji){
+    const s=document.createElement('span'); s.textContent=emoji; s.className='pop-in';
+    hud.appendChild(s);
+    if(hud.children.length>10) hud.removeChild(hud.firstChild);
+  }
+
+  /* ---------- sound effects ---------- */
+  function sound(freq,dur=.07,type='sine',vol=.045){
+    if(!musicOn) return;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=freq; o.type=type; g.gain.setValueAtTime(vol,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+      o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur);
+    }catch(e){}
+  }
+
+  /* Soft descending "plip" — like a raindrop landing. */
+  function plip(){
+    if(!musicOn) return;
+    const base=620+Math.random()*120;
+    sound(base,.09,'sine',.05);
+    setTimeout(()=>sound(base*0.7,.12,'sine',.04),60);
+  }
+
+  /* Gently speaks a word in the chosen language. */
+  function warmUpSpeech(){
+    try{
+      if(!('speechSynthesis' in window)) return;
+      speechSynthesis.getVoices();
+      if(!('onvoiceschanged' in speechSynthesis)) return;
+      speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+      if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel();
+      const warm=new SpeechSynthesisUtterance(' ');
+      warm.volume=0; warm.rate=1;
+      speechSynthesis.speak(warm);
+      speechSynthesis.cancel();
+    }catch(e){}
+  }
+  function speakWord(word){
+    if(!musicOn) return;
+    try{
+      if(!('speechSynthesis' in window)) return;
+      const u=new SpeechSynthesisUtterance(word);
+      u.lang=LANG[lang].langTag; u.rate=0.85; u.pitch=1.15; u.volume=0.8;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+      if(speechSynthesis.getVoices().length===0){
+        setTimeout(()=>{
+          speechSynthesis.cancel();
+          if('speechSynthesis' in window) speechSynthesis.speak(u);
+        },300);
+      }
+    }catch(e){}
+  }
+
+  /* ---------- generative, royalty-free background music ---------- */
+  let musicGain=null, nextNoteTime=0, schedulerId=null;
+  const scale=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25];
+  let beat=0;
+  function initMusic(){
+    if(musicStarted) return;
+    musicStarted=true;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      musicGain=audioCtx.createGain();
+      musicGain.gain.value=musicOn?0.09:0;
+      const filter=audioCtx.createBiquadFilter();
+      filter.type='lowpass'; filter.frequency.value=2200;
+      musicGain.connect(filter); filter.connect(audioCtx.destination);
+      nextNoteTime=audioCtx.currentTime+0.1;
+      scheduler();
+    }catch(e){}
+  }
+  function playNote(freq,time,dur,type,vol){
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,time);
+    g.gain.linearRampToValueAtTime(vol,time+0.04);
+    g.gain.exponentialRampToValueAtTime(0.0005,time+dur);
+    o.connect(g); g.connect(musicGain);
+    o.start(time); o.stop(time+dur+0.05);
+  }
+  function scheduleBeat(){
+    const t=nextNoteTime;
+    if(beat%4===0){
+      const root=scale[0]/2;
+      playNote(root,t,1.8,'triangle',0.5);
+      playNote(root*1.5,t,1.8,'triangle',0.35);
+    }
+    if(Math.random()<0.8){
+      const note=scale[Math.floor(Math.random()*scale.length)];
+      playNote(note,t+(Math.random()<0.3?0.2:0),0.9,'sine',0.55);
+    }
+    beat++;
+    nextNoteTime+=0.85;
+  }
+  function scheduler(){
+    if(!audioCtx) return;
+    while(nextNoteTime<audioCtx.currentTime+0.6){ scheduleBeat(); }
+    schedulerId=setTimeout(scheduler,150);
+  }
+  function setMusicEnabled(on){
+    musicOn=on;
+    soundBtn.textContent=on?'🔊':'🔇';
+    if(musicGain) musicGain.gain.setTargetAtTime(on?0.09:0, audioCtx.currentTime, 0.15);
+    if(!on){ try{speechSynthesis.cancel();}catch(e){} }
+  }
+  soundBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    initMusic();
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    setMusicEnabled(!musicOn);
+  });
+
+  /* ---------- fullscreen / kiosk mode ---------- */
+  function goFullscreen(){
+    try{
+      const el=document.documentElement;
+      if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    }catch(e){}
+  }
+  function updateFsBtn(){ fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶'; }
+  fsBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    if(document.fullscreenElement){ try{document.exitFullscreen();}catch(err){} }
+    else goFullscreen();
+  });
+  document.addEventListener('fullscreenchange',updateFsBtn);
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  });
+
+  /* ---------- gameplay ---------- */
+  function spawn(){
+    const r=Math.random();
+    const cls = r<0.08?'drop big':(r<0.28?'drop tiny':'drop');
+    const el=document.createElement('div'); el.className=cls;
+    el.innerHTML=`<div class="drop-visual"><div class="d-upper"></div><div class="d-tail"></div></div>`;
+    const w=innerWidth;
+    const x=6+Math.random()*(w-46);
+    const y=-60-Math.random()*80;
+    const speed=1.8+Math.random()*2.2;
+    el.style.left=x+'px'; el.style.top=y+'px';
+    el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed;
+    el.addEventListener('pointerdown',e=>{
+      e.preventDefault(); e.stopPropagation();
+      if(!started || !drops.has(el)) return;
+      initMusic();
+      if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+      drops.delete(el);
+      const dx=parseFloat(el.dataset.x)+15, dy=parseFloat(el.dataset.y)+15;
+      plip();
+      speakWord(LANG[lang].word);
+      splish(dx, dy);
+      tapsSinceSticker++;
+      if(tapsSinceSticker>=3){ addSticker(stickers[Math.floor(Math.random()*stickers.length)]); tapsSinceSticker=0; }
+      pop(dx,dy);
+      el.remove();
+    },{passive:false});
+    game.appendChild(el); drops.add(el);
+  }
+  function splish(x,y){
+    const s=document.createElement('div'); s.className='splash';
+    s.style.left=(x-13)+'px'; s.style.top=(y+4)+'px';
+    game.appendChild(s);
+    setTimeout(()=>s.remove(),500);
+  }
+  function pop(x,y){
+    const p=document.createElement('div');p.className='pop';p.textContent='💧';
+    p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
+    setTimeout(()=>p.remove(),600);
+  }
+  function loop(t){
+    if(started && t-lastSpawn>400 && drops.size<18){ spawn(); lastSpawn=t; }
+    const h=innerHeight;
+    drops.forEach(el=>{
+      let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.speed);
+      if(y>h+20){ drops.delete(el); el.remove(); return; }
+      el.dataset.y=y; el.style.top=y+'px';
+    });
+    requestAnimationFrame(loop);
+  }
+  game.addEventListener('pointerdown',()=>{ if(!started)return; initMusic(); goFullscreen(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); },{passive:true});
+  requestAnimationFrame(loop);
+
+  /* ---------- language selection ---------- */
+  function selectLang(code){
+    lang=code;
+    started=true;
+    const L=LANG[code];
+    hint.textContent=L.hint;
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=L.pick);
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=true);
+    langScreen.style.display='none';
+    hint.style.opacity='1';
+    setTimeout(()=>hint.style.opacity='0',3500);
+    setTimeout(warmUpSpeech,600);
+    lastSpawn=performance.now();
+  }
+  langScreen.querySelectorAll('.langBtn').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{
+      e.stopPropagation();
+      document.querySelector('.langBtn').focus();
+      selectLang(b.dataset.lang);
+    },{passive:true});
+  });
+  langBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    document.querySelector('.langBtn').focus();
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=LANG[lang].pick);
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=false);
+    langScreen.style.display='flex';
+    hint.style.opacity='0';
+  },{passive:true});
+
+  /* ---------- PWA service worker ---------- */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>

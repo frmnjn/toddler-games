@@ -16,8 +16,14 @@ games/
 │   ├── icon-512.png
 │   ├── v1/           # Snapshot versi lama (backup)
 │   └── v2/           # Snapshot versi lama (backup)
-└── shape-sorter/     # "Alana's Shape Garden"
-    ├── index.html    # Game: tap bentuk, muncul nama bentuknya (ID/EN)
+├── shape-sorter/     # "Alana's Shape Garden"
+│   ├── index.html    # Game: tap bentuk, muncul nama bentuknya (ID/EN)
+│   ├── manifest.json # PWA manifest
+│   ├── sw.js         # Service worker (offline / cache)
+│   ├── icon-192.png
+│   └── icon-512.png
+└── rain-garden/      # "Alana's Rain Garden"
+    ├── index.html    # Game: tap tetesan hujan yang jatuh (ID/EN)
     ├── manifest.json # PWA manifest
     ├── sw.js         # Service worker (offline / cache)
     ├── icon-192.png
@@ -51,9 +57,19 @@ Tap bentuk ramah (lingkaran, kotak, segitiga, bintang, hati) yang muncul berwarn
 - Tidak ada skor / angka agar fokus ke sebab-akibat untuk anak.
 - Musik latar & efek suara digenerate di browser (bebas lisensi).
 
+### Alana's Rain Garden (`rain-garden/`)
+
+Suasana hujan yang tenang. Tetesan hujan jatuh lurus dari atas; tap tetesan → "plip" + percikan 💧. Ada tetesan **besar** (langka) dan **kecil**.
+
+- **Pilih bahasa dulu** di awal: 🇮🇩 Bahasa Indonesia atau 🇺🇸 English.
+  - Saat tap, mengucapkan kata ("hujan"/"rain") sesuai bahasa yang dipilih.
+  - Tombol **🌐** di dalam game untuk ganti bahasa kapan saja.
+- Tidak ada skor / angka — fokus sensori visual + suara.
+- Musik latar & efek suara digenerate di browser (bebas lisensi).
+
 ## PWA & offline
 
-Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
+Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`, `rain-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
 
 Catatan: halaman launcher (`index.html`) **belum** punya manifest/offline sendiri — hanya game per individunya.
 
