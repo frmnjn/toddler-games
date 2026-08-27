@@ -1,4 +1,4 @@
-const CACHE = 'rain-garden-v1';
+const CACHE = 'rain-garden-v2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './assets/drop.mp3', './assets/drop-big.mp3'];
 
 self.addEventListener('install', e => {

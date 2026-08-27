@@ -60,11 +60,8 @@ Tap bentuk ramah (lingkaran, kotak, segitiga, bintang, hati) yang muncul berwarn
 
 ### Alana's Rain Garden (`rain-garden/`)
 
-Suasana hujan yang tenang. Tetesan hujan jatuh lurus dari atas; tap tetesan → "plip" + percikan 💧. Ada tetesan **besar** (langka) dan **kecil**.
+Suasana hujan yang tenang. Tetesan hujan jatuh lurus dari atas; tap tetesan → percikan 💧 + suara splash asli. Ada tetesan **besar** (langka) dan **kecil**.
 
-- **Pilih bahasa dulu** di awal: 🇮🇩 Bahasa Indonesia atau 🇺🇸 English.
-  - Saat tap, mengucapkan kata ("hujan"/"rain") sesuai bahasa yang dipilih.
-  - Tombol **🌐** di dalam game untuk ganti bahasa kapan saja.
 - Tidak ada skor / angka — fokus sensori visual + suara.
 - Suara percikan tetesan pakai **SFX asli** (CC0, lisensi bebas komersial, sumber BigSoundBank — lihat `rain-garden/assets/SOURCES.txt`), diputar via Web Audio; fallback ke sintesis jika gagal dimuat.
 - Musik latar digenerate di browser (bebas lisensi).

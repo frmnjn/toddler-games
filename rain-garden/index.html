@@ -33,7 +33,7 @@
   @keyframes stickerPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
   #parentBtns{position:absolute;z-index:25;top:max(10px,env(safe-area-inset-top));right:14px;
     display:flex;gap:8px}
-  #soundBtn,#fsBtn,#langBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+  #soundBtn,#fsBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
     font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
     cursor:pointer;opacity:.55}
   .drop{position:absolute;z-index:10;cursor:pointer}
@@ -52,16 +52,6 @@
   #hint{position:absolute;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
     background:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;color:#3a5a7a;font-weight:700;
     font-size:15px;white-space:nowrap;box-shadow:0 3px 12px #0002;transition:opacity .5s}
-  #langScreen{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 0%, #e6f2fb 0%, #cfe4f5 55%, #b8d4ee 100%);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
-  #langScreen .lang-title{font-size:clamp(24px,6vw,34px);font-weight:900;color:#2f4a66;margin:0 0 6px}
-  #langScreen .lang-sub{font-size:16px;color:#3c5a78;opacity:.85;margin:0 0 32px}
-  #langBtns{display:flex;flex-direction:column;gap:16px;width:min(280px,78vw)}
-  .langBtn{padding:18px;font-size:20px;font-weight:800;border:none;border-radius:20px;cursor:pointer;
-    background:#fff;color:#2f4a66;box-shadow:0 6px 18px #0002;display:flex;align-items:center;justify-content:center;gap:10px;
-    transition:transform .15s}
-  .langBtn:active{transform:scale(.96)}
-  .langBtn .flag{font-size:26px}
   @keyframes drift{from{transform:translateX(-18vw) scale(var(--sc,1))}to{transform:translateX(118vw) scale(var(--sc,1))}}
   .cloud{animation:drift linear infinite}
   .c1{--sc:1;animation-duration:26s}.c2{--sc:.7;animation-duration:34s}
@@ -73,33 +63,19 @@
   <div id="ground"></div>
   <div id="hud"></div>
   <div id="parentBtns">
-    <button id="langBtn" aria-label="Change language">🌐</button>
     <button id="fsBtn" aria-label="Fullscreen">⛶</button>
     <button id="soundBtn" aria-label="Toggle sound">🔊</button>
   </div>
-  <div id="hint">👆 Tap a drop!</div>
-</div>
-<div id="langScreen">
-  <div class="lang-title">🌧️ Alana's Rain Garden</div>
-  <div class="lang-sub" data-key="pick">Pilih bahasa / Choose language</div>
-  <div id="langBtns">
-    <button class="langBtn" data-lang="id"><span class="flag">🇮🇩</span> Bahasa Indonesia</button>
-    <button class="langBtn" data-lang="en"><span class="flag">🇺🇸</span> English</button>
-  </div>
+  <div id="hint">👆 Ketuk airnya!</div>
 </div>
 <script>
 (() => {
   const game=document.getElementById('game'), hud=document.getElementById('hud'),
         soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
-        langBtn=document.getElementById('langBtn'), langScreen=document.getElementById('langScreen'),
         hint=document.getElementById('hint');
   let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false, lastFall=0;
   let tapsSinceSticker=0;
-  let lang='id', started=false;
-  const LANG={
-    id:{ langTag:'id-ID', hint:'👆 Ketuk airnya!', pick:'Pilih bahasa', word:'hujan' },
-    en:{ langTag:'en-US', hint:'👆 Tap a drop!',  pick:'Choose language', word:'rain' }
-  };
+  let started=false;
   const stickers=['💧','🌈','☔','🌦️','🌿','🐸'];
   const drops=new Set();
 
@@ -158,37 +134,6 @@
   }
   function plip(isBig){ playDrop(!!isBig); }
 
-  /* Gently speaks a word in the chosen language. */
-  function warmUpSpeech(){
-    try{
-      if(!('speechSynthesis' in window)) return;
-      speechSynthesis.getVoices();
-      if(!('onvoiceschanged' in speechSynthesis)) return;
-      speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
-      if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel();
-      const warm=new SpeechSynthesisUtterance(' ');
-      warm.volume=0; warm.rate=1;
-      speechSynthesis.speak(warm);
-      speechSynthesis.cancel();
-    }catch(e){}
-  }
-  function speakWord(word){
-    if(!musicOn) return;
-    try{
-      if(!('speechSynthesis' in window)) return;
-      const u=new SpeechSynthesisUtterance(word);
-      u.lang=LANG[lang].langTag; u.rate=0.85; u.pitch=1.15; u.volume=0.8;
-      speechSynthesis.cancel();
-      speechSynthesis.speak(u);
-      if(speechSynthesis.getVoices().length===0){
-        setTimeout(()=>{
-          speechSynthesis.cancel();
-          if('speechSynthesis' in window) speechSynthesis.speak(u);
-        },300);
-      }
-    }catch(e){}
-  }
-
   /* ---------- generative, royalty-free background music ---------- */
   let musicGain=null, nextNoteTime=0, schedulerId=null;
   const scale=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25];
@@ -240,7 +185,6 @@
     musicOn=on;
     soundBtn.textContent=on?'🔊':'🔇';
     if(musicGain) musicGain.gain.setTargetAtTime(on?0.09:0, audioCtx.currentTime, 0.15);
-    if(!on){ try{speechSynthesis.cancel();}catch(e){} }
   }
   soundBtn.addEventListener('pointerdown',e=>{
     e.stopPropagation();
@@ -287,7 +231,6 @@
       drops.delete(el);
       const dx=parseFloat(el.dataset.x)+15, dy=parseFloat(el.dataset.y)+15;
       plip(el.classList.contains('big'));
-      speakWord(LANG[lang].word);
       splish(dx, dy);
       tapsSinceSticker++;
       if(tapsSinceSticker>=3){ addSticker(stickers[Math.floor(Math.random()*stickers.length)]); tapsSinceSticker=0; }
@@ -320,35 +263,11 @@
   game.addEventListener('pointerdown',()=>{ if(!started)return; initMusic(); goFullscreen(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); },{passive:true});
   requestAnimationFrame(loop);
 
-  /* ---------- language selection ---------- */
-  function selectLang(code){
-    lang=code;
-    started=true;
-    const L=LANG[code];
-    hint.textContent=L.hint;
-    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=L.pick);
-    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=true);
-    langScreen.style.display='none';
-    hint.style.opacity='1';
-    setTimeout(()=>hint.style.opacity='0',3500);
-    setTimeout(warmUpSpeech,600);
-    lastSpawn=performance.now();
-  }
-  langScreen.querySelectorAll('.langBtn').forEach(b=>{
-    b.addEventListener('pointerdown',e=>{
-      e.stopPropagation();
-      document.querySelector('.langBtn').focus();
-      selectLang(b.dataset.lang);
-    },{passive:true});
-  });
-  langBtn.addEventListener('pointerdown',e=>{
-    e.stopPropagation();
-    document.querySelector('.langBtn').focus();
-    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=LANG[lang].pick);
-    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=false);
-    langScreen.style.display='flex';
-    hint.style.opacity='0';
-  },{passive:true});
+  /* ---------- start ---------- */
+  started=true;
+  hint.style.opacity='1';
+  setTimeout(()=>hint.style.opacity='0',3500);
+  lastSpawn=performance.now();
 
   /* ---------- PWA service worker ---------- */
   if('serviceWorker' in navigator){
