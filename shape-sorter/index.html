@@ -131,6 +131,19 @@
 
   /* Gently speaks the shape's name in the chosen language — a small, optional */
   /* educational touch. Falls back silently if speech isn't supported. */
+  function warmUpSpeech(){
+    try{
+      if(!('speechSynthesis' in window)) return;
+      speechSynthesis.getVoices();
+      if(!('onvoiceschanged' in speechSynthesis)) return;
+      speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+      if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel();
+      const warm=new SpeechSynthesisUtterance(' ');
+      warm.volume=0; warm.rate=1;
+      speechSynthesis.speak(warm);
+      speechSynthesis.cancel();
+    }catch(e){}
+  }
   function speakName(name){
     if(!musicOn) return;
     try{
@@ -139,6 +152,13 @@
       u.lang=LANG[lang].langTag; u.rate=0.85; u.pitch=1.15; u.volume=0.8;
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
+      /* Retry once if voices aren't loaded yet (Chrome loads them lazily). */
+      if(speechSynthesis.getVoices().length===0){
+        setTimeout(()=>{
+          speechSynthesis.cancel();
+          if('speechSynthesis' in window) speechSynthesis.speak(u);
+        },300);
+      }
     }catch(e){}
   }
 
@@ -288,6 +308,7 @@
     langScreen.style.display='none';
     hint.style.opacity='1';
     setTimeout(()=>hint.style.opacity='0',3500);
+    setTimeout(warmUpSpeech,600);
     lastSpawn=performance.now();
     for(let i=0;i<3;i++) setTimeout(spawn,i*450);
   }
