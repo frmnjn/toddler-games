@@ -220,7 +220,7 @@
     const w=innerWidth;
     const x=6+Math.random()*(w-46);
     const y=-60-Math.random()*80;
-    const speed=1.8+Math.random()*2.2;
+    const speed=1.2+Math.random()*1.3;
     el.style.left=x+'px'; el.style.top=y+'px';
     el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed;
     el.addEventListener('pointerdown',e=>{
@@ -251,7 +251,7 @@
     setTimeout(()=>p.remove(),600);
   }
   function loop(t){
-    if(started && t-lastSpawn>400 && drops.size<18){ spawn(); lastSpawn=t; }
+    if(started && t-lastSpawn>550 && drops.size<18){ spawn(); lastSpawn=t; }
     const h=innerHeight;
     drops.forEach(el=>{
       let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.speed);
