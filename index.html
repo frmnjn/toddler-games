@@ -4,6 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Games — frmnjn.my.id</title>
+<meta name="theme-color" content="#8ed6ff">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="rain-garden/icon-192.png">
+<link rel="apple-touch-icon" href="rain-garden/icon-192.png">
+<meta property="og:title" content="Games — frmnjn.my.id">
+<meta property="og:description" content="Bermain game Alana: semut, bentuk, hujan, dan binatang.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://frmnjn.my.id/games/">
+<meta property="og:image" content="https://frmnjn.my.id/games/rain-garden/icon-512.png">
+<meta name="twitter:card" content="summary_large_image">
 <style>
   *{box-sizing:border-box}
   html,body{height:100%;overflow:hidden}
@@ -53,6 +63,13 @@ fetch('games.json', {cache:'no-store'})
     });
   })
   .catch(() => { document.getElementById('err').style.display='block'; });
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

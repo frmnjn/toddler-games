@@ -48,7 +48,9 @@
     animation:pop .55s ease-out forwards;pointer-events:none;white-space:nowrap}
   @keyframes pop{0%{transform:scale(.5) translateY(0);opacity:0}25%{transform:scale(1.25) translateY(0);opacity:1}100%{transform:scale(1) translateY(-40px);opacity:0}}
   .splash{position:absolute;z-index:12;pointer-events:none;width:26px;height:6px;border-radius:50%;
-    background:repeating-linear-gradient(90deg,#9cc8ec 0 6px,transparent 6px 14px);opacity:.8}
+    background:repeating-linear-gradient(90deg,#9cc8ec 0 6px,transparent 6px 14px);
+    animation:ripple .55s ease-out forwards}
+  @keyframes ripple{from{transform:scale(.6);opacity:.8}to{transform:scale(2.6);opacity:0}}
   #hint{position:absolute;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
     background:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;color:#3a5a7a;font-weight:700;
     font-size:15px;white-space:nowrap;box-shadow:0 3px 12px #0002;transition:opacity .5s}
@@ -224,7 +226,7 @@
     const y=-60-Math.random()*80;
     const speed=0.7+Math.random()*0.9;
     el.style.left=x+'px'; el.style.top=y+'px';
-    el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed;
+    el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed; el.dataset.phase=Math.random()*Math.PI*2;
     el.addEventListener('pointerdown',e=>{
       e.preventDefault(); e.stopPropagation();
       if(!started || !drops.has(el)) return;
@@ -245,7 +247,7 @@
     const s=document.createElement('div'); s.className='splash';
     s.style.left=(x-13)+'px'; s.style.top=(y+4)+'px';
     game.appendChild(s);
-    setTimeout(()=>s.remove(),500);
+    setTimeout(()=>s.remove(),580);
   }
   function pop(x,y){
     const p=document.createElement('div');p.className='pop';p.textContent='💧';
@@ -258,7 +260,8 @@
     drops.forEach(el=>{
       let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.speed);
       if(y>h+20){ drops.delete(el); el.remove(); return; }
-      el.dataset.y=y; el.style.top=y+'px';
+      const x=parseFloat(el.dataset.x)+Math.sin(parseFloat(el.dataset.phase)+t*0.001)*Math.min(10,innerWidth*0.03);
+      el.dataset.y=y; el.style.top=y+'px'; el.style.left=x+'px';
     });
     requestAnimationFrame(loop);
   }

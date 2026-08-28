@@ -8,6 +8,8 @@ Kumpulan game web sederhana (static, vanilla HTML/CSS/JS) yang dibuat untuk anak
 games/
 ├── index.html        # Halaman utama / launcher — render kartu game dari games.json
 ├── games.json        # Registry game (id, title, description, icon, url)
+├── manifest.json     # PWA manifest untuk launcher ("Alana's Games")
+├── sw.js             # Service worker launcher (offline / cache)
 ├── ant-smasher/      # "Alana's Ant Garden"
 │   ├── index.html    # Game: tap semut yang bergerak di taman
 │   ├── manifest.json # PWA manifest
@@ -85,9 +87,9 @@ Taman hewan yang ramai: 9 hewan asli (kucing, anjing, ayam jago, sapi, bebek, ku
 
 ## PWA & offline
 
-Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`, `rain-garden-v1`, `animal-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
+Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **network-first untuk HTML + stale-while-revalidate untuk aset** dengan versi cache terpisah (`ant-garden-v2`, `shape-garden-v2`, `rain-garden-v3`, `animal-garden-v2`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
 
-Catatan: halaman launcher (`index.html`) **belum** punya manifest/offline sendiri — hanya game per individunya.
+Halaman launcher (`index.html`) juga punya `manifest.json` + `sw.js` sendiri ("Alana's Games") sehingga halaman utama bisa di-install & offline. Konsep tetap **1 game = 1 app**.
 
 ## Teknis
 

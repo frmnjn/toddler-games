@@ -1,5 +1,5 @@
-const CACHE = 'rain-garden-v3';
-const ASSETS = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png', './assets/drop.mp3', './assets/drop-big.mp3'];
+const CACHE = 'games-launcher-v1';
+const ASSETS = ['./', './index.html', './manifest.json', './rain-garden/icon-192.png', './rain-garden/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
