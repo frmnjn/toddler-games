@@ -20,6 +20,13 @@
       "description": "Tap the falling raindrops.",
       "icon": "rain-garden/icon-192.png",
       "url": "rain-garden/"
+    },
+    {
+      "id": "animal-garden",
+      "title": "Alana's Animal Garden",
+      "description": "Tap the animals and hear their sound.",
+      "icon": "animal-garden/icon-192.png",
+      "url": "animal-garden/"
     }
   ]
 }

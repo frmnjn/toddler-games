@@ -1,0 +1,15 @@
+{
+  "name": "Alana's Animal Garden",
+  "short_name": "Animal Garden",
+  "description": "Tap the animals and hear their real sounds.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#bfe8a0",
+  "theme_color": "#bfe8a0",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

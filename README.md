@@ -22,13 +22,20 @@ games/
 │   ├── sw.js         # Service worker (offline / cache)
 │   ├── icon-192.png
 │   └── icon-512.png
-└── rain-garden/      # "Alana's Rain Garden"
-    ├── index.html    # Game: tap tetesan hujan yang jatuh (ID/EN)
+├── rain-garden/      # "Alana's Rain Garden"
+│   ├── index.html    # Game: tap tetesan hujan yang jatuh (ID/EN)
+│   ├── manifest.json # PWA manifest
+│   ├── sw.js         # Service worker (offline / cache)
+│   ├── icon-192.png
+│   ├── icon-512.png
+│   └── assets/       # SFX raindrop (CC0 — lihat SOURCES.txt)
+└── animal-garden/    # "Alana's Animal Garden"
+    ├── index.html    # Game: tap hewan asli, dengar suaranya (tanpa TTS)
     ├── manifest.json # PWA manifest
     ├── sw.js         # Service worker (offline / cache)
     ├── icon-192.png
     ├── icon-512.png
-    └── assets/       # SFX raindrop (CC0 — lihat SOURCES.txt)
+    └── assets/       # 9 suara binatang CC0 + 9 gambar (lihat SOURCES.txt)
 ```
 
 ## Cara deploy
@@ -66,16 +73,26 @@ Suasana hujan yang tenang. Tetesan hujan jatuh lurus dari atas; tap tetesan → 
 - Suara percikan tetesan pakai **SFX asli** (CC0, lisensi bebas komersial, sumber BigSoundBank — lihat `rain-garden/assets/SOURCES.txt`), diputar via Web Audio; fallback ke sintesis jika gagal dimuat.
 - Musik latar digenerate di browser (bebas lisensi).
 
+### Alana's Animal Garden (`animal-garden/`)
+
+Taman hewan yang ramai: 9 hewan asli (kucing, anjing, ayam jago, sapi, bebek, kuda, domba, burung hantu, burung) berkeliaran & memantul pelan di taman; tap → **suara aslinya** terputar asli.
+
+- Gambar **asli** (bukan kotak teks): kucing/anjing/burung hantu sebagai *cutout* transparan; sisanya foto asli dalam **stiker bulat** putih.
+- Suara pakai **SFX asli** (CC0, BigSoundBank — lihat `animal-garden/assets/SOURCES.txt`), diputar realtime via Web Audio; fallback ke suara sintesis per hewan jika file gagal dimuat.
+- **Tanpa TTS / tanpa pilih bahasa** — fokus sebab-akibat suara-gambar; anime pas ditambah *chime* + sticker emoji di atas.
+- Ada hewan ukuran **besar** (langka) dengan suara lebih keras.
+- Musik latar digenerate di browser (bebas lisensi).
+
 ## PWA & offline
 
-Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`, `rain-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
+Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **cache-first** dengan versi cache terpisah (`ant-garden-v1`, `shape-garden-v1`, `rain-garden-v1`, `animal-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
 
 Catatan: halaman launcher (`index.html`) **belum** punya manifest/offline sendiri — hanya game per individunya.
 
 ## Teknis
 
 - Bahasa UI halaman utama & hint sebagian besar dalam **Bahasa Indonesia** (`lang="id"`).
-- Audio (efek + musik) disintesis dengan Web Audio API — tidak ada file audio.
+- Audio efek & musik disintesis dengan Web Audio API, plus **SFX asli** (CC0) untuk rain-garden & animal-garden — semua file lokal, tanpa dependensi eksternal.
 - Game state ringan (DOM + `requestAnimationFrame`), cocok untuk perangkat mobile.
 
 Icons & title disesuaikan untuk anak; project ini bersifat pribadi/keluarga.

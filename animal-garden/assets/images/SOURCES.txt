@@ -1,0 +1,37 @@
+Animal images (Wikimedia Commons)
+==================================
+Hybrid set: transparent cutout PNGs where available, real photos shown as
+rounded photo-stickers for the rest. Each file's author + license + source
+page is listed below. CC BY / CC BY-SA works must keep this credit.
+
+  - cat.png    = File:Turkish Van cat transparent (cropped).png
+                 License: CC BY-SA 4.0 | Author: Matsu1024
+                 https://commons.wikimedia.org/wiki/File:Turkish_Van_cat_transparent_(cropped).png
+  - dog.png    = File:Little white dog on transparent background PNG.png
+                 License: CC0 (public domain) | Author: Kissmykumbaya
+                 https://commons.wikimedia.org/wiki/File:Little_white_dog_on_transparent_background_PNG.png
+  - owl.png    = File:Tyto alba -British Wildlife Centre, Surrey, England
+                 -flying-8a (transparent).png
+                 License: CC BY 2.0 | Author: Peter Trimming
+                 https://commons.wikimedia.org/wiki/File:Tyto_alba_-British_Wildlife_Centre,_Surrey,_England_-flying-8a_(transparent).png
+  - rooster.jpg = File:Rooster portrait, France.jpg
+                 License: CC BY-SA 4.0 | Author: Clément Bardot
+                 https://commons.wikimedia.org/wiki/File:Rooster_portrait,_France.jpg
+  - cow.jpg    = File:Cow female black white.jpg
+                 License: Public domain (USDA) | Author: Keith Weller/USDA
+                 https://commons.wikimedia.org/wiki/File:Cow_female_black_white.jpg
+  - duck.jpg   = File:Male mallard duck 2.jpg
+                 License: CC BY 3.0 | Author: Acarpentier
+                 https://commons.wikimedia.org/wiki/File:Male_mallard_duck_2.jpg
+  - sheep.jpg  = File:Stubai - Tiroler Bergschaf -BT- 01.jpg
+                 License: CC BY-SA 4.0 | Author: Basotxerri
+                 https://commons.wikimedia.org/wiki/File:Stubai_-_Tiroler_Bergschaf_-BT-_01.jpg
+  - horse.jpg  = File:Horse December 2014-1.jpg
+                 License: CC BY-SA 4.0 | Author: Alvesgaspar
+                 https://commons.wikimedia.org/wiki/File:Horse_December_2014-1.jpg
+  - bird.jpg   = File:Female house sparrow at Kodai.jpg
+                 License: CC BY-SA 4.0 | Author: It.deepak
+                 https://commons.wikimedia.org/wiki/File:Female_house_sparrow_at_Kodai.jpg
+
+Cutouts (cat, dog, owl) were downscaled to <=640px (nearest-neighbor) for
+offline weight; aspect ratio and alpha channel are preserved.

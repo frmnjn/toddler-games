@@ -16,8 +16,9 @@ echo "==> pull di server"
 ssh "$REMOTE" "cd $DEPLOY_DIR && git pull"
 
 echo "==> verifikasi HTTP"
-curl -s -o /dev/null -w "index: %{http_code}\n" https://frmnjn.my.id/games/
-curl -s -o /dev/null -w "shape: %{http_code}\n" https://frmnjn.my.id/games/shape-sorter/
-curl -s -o /dev/null -w "ant:   %{http_code}\n" https://frmnjn.my.id/games/ant-smasher/
+curl -s -o /dev/null -w "index:   %{http_code}\n" https://frmnjn.my.id/games/
+curl -s -o /dev/null -w "shape:   %{http_code}\n" https://frmnjn.my.id/games/shape-sorter/
+curl -s -o /dev/null -w "ant:     %{http_code}\n" https://frmnjn.my.id/games/ant-smasher/
+curl -s -o /dev/null -w "animal:  %{http_code}\n" https://frmnjn.my.id/games/animal-garden/
 
 echo "==> done"

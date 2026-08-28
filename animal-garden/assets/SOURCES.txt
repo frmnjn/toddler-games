@@ -1,0 +1,32 @@
+Animal sound effects
+====================
+All sounds are CC0 (public-domain equivalent): free for commercial use,
+no attribution required.
+
+Source: BigSoundBank (LaSonotheque) - https://bigsoundbank.com
+License: https://bigsoundbank.com/licenses.html
+
+Direct file URLs (https://bigsoundbank.com/UPLOAD/mp3/<no>.mp3):
+  - cat.mp3      = Meow Cat #10            (#1898)  00:02
+  - dog.mp3      = Barking of a Spitz      (#0682)  00:01
+  - rooster.mp3  = Cock Song #1            (#0440)  00:02
+  - cow.mp3      = Cow Moos #6             (#2386)  00:03
+  - duck.mp3     = Mallard duck plush      (#0417)  00:04
+  - horse.mp3    = Neighing of a Horse #1  (#0284)  00:02
+  - sheep.mp3    = Sheep #1                (#2343)  00:01
+  - owl.mp3      = Tawny Owl #3            (#3459)  00:02
+  - bird.mp3     = Common Nightingale #2   (#3087)  00:04
+
+Original pages (description / author per sound):
+  https://bigsoundbank.com/meow-cat-10-s1898.html
+  https://bigsoundbank.com/barking-of-a-spitz-s0682.html
+  https://bigsoundbank.com/cock-song-1-s0440.html
+  https://bigsoundbank.com/cow-moos-6-s2386.html
+  https://bigsoundbank.com/mallard-duck-plush-s0417.html
+  https://bigsoundbank.com/neighing-of-a-horse-1-s0284.html
+  https://bigsoundbank.com/sheep-1-s2343.html
+  https://bigsoundbank.com/tawny-owl-3-s3459.html
+  https://bigsoundbank.com/common-nightingale-2-s3087.html
+
+Note: duck.mp3 is a mallard-duck plush toy (the only short CC0 duck clip
+available); bird.mp3 is a common nightingale (songbird).
