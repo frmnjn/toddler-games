@@ -39,7 +39,7 @@
     border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:18px;box-shadow:0 4px 14px #0002;
     display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;cursor:pointer;opacity:.8}
   .shape{position:absolute;width:120px;height:120px;z-index:10;display:flex;align-items:center;justify-content:center;
-    cursor:pointer}
+    cursor:pointer;will-change:transform;left:0;top:0}
   .shape .visual{width:82px;height:82px;filter:drop-shadow(0 5px 4px #0002);transition:transform .15s}
   .shape .visual.circle{border-radius:50%}
   .shape .visual.square{border-radius:14px}
@@ -261,9 +261,9 @@
     el.innerHTML=`<div class="visual ${shape.key}" style="background:${color}"></div>`;
     const w=innerWidth,h=innerHeight;
     const x=4+Math.random()*(w-124), y=Math.max(h*.14,50)+Math.random()*(h*.72-120);
-    el.style.left=x+'px'; el.style.top=y+'px';
-    el.dataset.x=x; el.dataset.y=y;
+    el.dataset.x=x; el.dataset.y=y; el.dataset.sc=1;
     el.dataset.vx=(Math.random()-.5)*0.5; el.dataset.vy=(Math.random()-.5)*0.32;
+    moveEl(el,Math.round(x),Math.round(y));
     el.addEventListener('pointerdown',e=>{
       e.preventDefault(); e.stopPropagation();
       if(!started || !ants.has(el)) return;
@@ -287,6 +287,9 @@
     p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
     setTimeout(()=>p.remove(),600);
   }
+  function moveEl(el,x,y){
+    el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
+  }
   function loop(t){
     if(started && t-lastSpawn>1100 && ants.size<5){spawn();lastSpawn=t;}
     ants.forEach(el=>{
@@ -296,7 +299,8 @@
       if(x<4||x>maxX) el.dataset.vx=(-parseFloat(el.dataset.vx));
       if(y<minY||y>maxY) el.dataset.vy=(-parseFloat(el.dataset.vy));
       x=Math.max(4,Math.min(maxX,x)); y=Math.max(minY,Math.min(maxY,y));
-      el.dataset.x=x;el.dataset.y=y;el.style.left=x+'px';el.style.top=y+'px';
+      el.dataset.x=x;el.dataset.y=y;
+      moveEl(el,Math.round(x),Math.round(y));
     });
     requestAnimationFrame(loop);
   }

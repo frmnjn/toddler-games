@@ -38,7 +38,7 @@
     font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
     cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
   .ant{position:absolute;width:100px;height:100px;z-index:10;transform-origin:center;
-    cursor:pointer}
+    cursor:pointer;will-change:transform;left:0;top:0}
   .ant .visual{position:absolute;left:14px;top:14px;width:72px;height:72px;filter:drop-shadow(0 5px 3px #0003)}
   .ant.flip .visual{transform:scaleX(-1)}
   .ant.golden .body,.ant.golden .head,.ant.golden .rear{background:#caa23a}
@@ -220,9 +220,9 @@
     </div>`;
     const w=innerWidth,h=innerHeight;
     const x=4+Math.random()*(w-108), y=Math.max(h*.40,60)+Math.random()*(h*.5-100);
-    el.style.left=x+'px'; el.style.top=y+'px';
-    el.dataset.x=x; el.dataset.y=y;
+    el.dataset.x=x; el.dataset.y=y; el.dataset.sc=1;
     el.dataset.vx=(Math.random()-.5)*0.55; el.dataset.vy=(Math.random()-.5)*0.35;
+    moveEl(el,Math.round(x),Math.round(y));
     el.addEventListener('pointerdown',e=>{
       e.preventDefault(); e.stopPropagation();
       initMusic();
@@ -245,6 +245,9 @@
     p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
     setTimeout(()=>p.remove(),600);
   }
+  function moveEl(el,x,y){
+    el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
+  }
   function loop(t){
     if(t-lastSpawn>900 && ants.size<7){spawn();lastSpawn=t;}
     ants.forEach(el=>{
@@ -254,7 +257,8 @@
       if(x<4||x>maxX) el.dataset.vx=(-parseFloat(el.dataset.vx));
       if(y<minY||y>maxY) el.dataset.vy=(-parseFloat(el.dataset.vy));
       x=Math.max(4,Math.min(maxX,x)); y=Math.max(minY,Math.min(maxY,y));
-      el.dataset.x=x;el.dataset.y=y;el.style.left=x+'px';el.style.top=y+'px';
+      el.dataset.x=x;el.dataset.y=y;
+      moveEl(el,Math.round(x),Math.round(y));
     });
     requestAnimationFrame(loop);
   }

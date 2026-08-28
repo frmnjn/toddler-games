@@ -39,8 +39,7 @@
   #soundBtn,#fsBtn,#homeBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
     font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
     cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
-  .sprite{position:absolute;z-index:10;cursor:pointer}
-  .sprite.big{transform:scale(1.35)}
+  .sprite{position:absolute;z-index:10;cursor:pointer;will-change:transform;left:0;top:0}
   .sprite .anim{animation:bob 2.6s ease-in-out infinite}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
   .sprite img.cutout{pointer-events:none;width:100%;height:auto;display:block;filter:drop-shadow(0 6px 5px #0002)}
@@ -254,7 +253,7 @@
     el.innerHTML=a.cutout
       ? `<div class="anim"><img class="cutout" src="${a.img}" alt="" draggable="false"></div>`
       : `<div class="anim"><div class="badge"><img src="${a.img}" alt="" draggable="false"></div></div>`;
-    el.dataset.a=a.key; el.dataset.big=big?'1':'0';
+    el.dataset.a=a.key; el.dataset.big=big?'1':'0'; el.dataset.sc=big?1.35:1;
     game.appendChild(el);
     const bw=a.bw;
     el.style.width=bw+'px';
@@ -262,9 +261,9 @@
     const w=innerWidth,h=innerHeight;
     const x=4+Math.random()*(Math.max(w-sw,10));
     const y=Math.max(h*0.15,70)+Math.random()*Math.max(h*0.5-sh,10);
-    el.style.left=x+'px'; el.style.top=y+'px';
     el.dataset.x=x; el.dataset.y=y; el.dataset.w=sw; el.dataset.h=sh;
     el.dataset.vx=(Math.random()-.5)*0.9; el.dataset.vy=(Math.random()-.5)*0.55;
+    moveEl(el,Math.round(x),Math.round(y));
     el.addEventListener('pointerdown',e=>{
       e.preventDefault(); e.stopPropagation();
       if(!started || !active.has(el)) return;
@@ -290,6 +289,9 @@
     p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
     setTimeout(()=>p.remove(),650);
   }
+  function moveEl(el,x,y){
+    el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
+  }
   function loop(t){
     if(t-lastSpawn>1050 && active.size<6){ spawn(); lastSpawn=t; }
     const w=innerWidth,h=innerHeight;
@@ -302,7 +304,8 @@
       if(y<minY||y>maxY) el.dataset.vy=(-parseFloat(el.dataset.vy));
       x=Math.max(4,Math.min(maxX,x));
       y=Math.min(Math.max(y,minY),Math.max(maxY,minY));
-      el.dataset.x=x;el.dataset.y=y;el.style.left=x+'px';el.style.top=y+'px';
+      el.dataset.x=x;el.dataset.y=y;
+      moveEl(el,Math.round(x),Math.round(y));
     });
     requestAnimationFrame(loop);
   }

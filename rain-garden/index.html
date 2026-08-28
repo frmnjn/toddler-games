@@ -36,13 +36,11 @@
   #soundBtn,#fsBtn,#homeBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
     font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
     cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
-  .drop{position:absolute;z-index:10;cursor:pointer}
+  .drop{position:absolute;z-index:10;cursor:pointer;will-change:transform;left:0;top:0}
   .drop .drop-visual{width:34px;height:44px;position:relative;filter:drop-shadow(0 6px 4px #0001)}
   .drop .d-upper{position:absolute;left:5px;top:0;width:24px;height:24px;border-radius:50%;background:#5a9bd8}
   .drop .d-tail{position:absolute;left:8px;top:18px;width:18px;height:24px;border-radius:0 0 50% 50%;background:#5a9bd8}
-  .drop.big{transform:scale(1.5)}
   .drop.big .d-upper,.drop.big .d-tail{background:#6db3e8}
-  .drop.tiny{transform:scale(.75)}
   .drop.tiny .d-upper,.drop.tiny .d-tail{background:#8cc0ec}
   .pop{position:absolute;z-index:30;font-weight:900;font-size:26px;color:#fff;text-shadow:0 2px 4px #0005;
     animation:pop .55s ease-out forwards;pointer-events:none;white-space:nowrap}
@@ -219,14 +217,15 @@
   function spawn(){
     const r=Math.random();
     const cls = r<0.08?'drop big':(r<0.28?'drop tiny':'drop');
+    const sc = r<0.08?1.5:(r<0.28?0.75:1);
     const el=document.createElement('div'); el.className=cls;
     el.innerHTML=`<div class="drop-visual"><div class="d-upper"></div><div class="d-tail"></div></div>`;
     const w=innerWidth;
     const x=6+Math.random()*(w-46);
     const y=-60-Math.random()*80;
     const speed=0.7+Math.random()*0.9;
-    el.style.left=x+'px'; el.style.top=y+'px';
-    el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed; el.dataset.phase=Math.random()*Math.PI*2;
+    el.dataset.x=x; el.dataset.y=y; el.dataset.speed=speed; el.dataset.phase=Math.random()*Math.PI*2; el.dataset.sc=sc;
+    moveEl(el,Math.round(x),Math.round(y));
     el.addEventListener('pointerdown',e=>{
       e.preventDefault(); e.stopPropagation();
       if(!started || !drops.has(el)) return;
@@ -254,14 +253,24 @@
     p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
     setTimeout(()=>p.remove(),600);
   }
+  function moveEl(el,x,y){
+    el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
+  }
   function loop(t){
     if(started && t-lastSpawn>550 && drops.size<18){ spawn(); lastSpawn=t; }
     const h=innerHeight;
+    const groundY=h*0.8;
     drops.forEach(el=>{
       let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.speed);
-      if(y>h+20){ drops.delete(el); el.remove(); return; }
       const x=parseFloat(el.dataset.x)+Math.sin(parseFloat(el.dataset.phase)+t*0.001)*Math.min(10,innerWidth*0.03);
-      el.dataset.y=y; el.style.top=y+'px'; el.style.left=x+'px';
+      if(y>=groundY-24){
+        drops.delete(el); el.remove();
+        splish(x, groundY-8);
+        if(Math.random()<0.3) plip(false);
+        return;
+      }
+      el.dataset.y=y;
+      moveEl(el,Math.round(x),Math.round(y));
     });
     requestAnimationFrame(loop);
   }
