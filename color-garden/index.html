@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Alana's Color Garden</title>
+<meta name="theme-color" content="#ffe8d6">
+<meta name="description" content="Tap the friendly colors — they pop into sparkles and say their name.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Color Garden">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-touch-callout:none}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#ffe8d6;font-family:system-ui,-apple-system,Segoe UI,sans-serif;overscroll-behavior:none}
+  body{touch-action:none}
+  #game{position:fixed;inset:0;overflow:hidden;background:
+    linear-gradient(180deg,#ffe3d0 0%,#ffd6a8 55%,#bfe8a0 55%)}
+  .sun{position:absolute;right:8vw;top:5vh;width:70px;height:70px;border-radius:50%;
+    background:#ffe27a;box-shadow:0 0 35px #fff2a8}
+  .cloud{position:absolute;width:120px;height:32px;background:#fff;border-radius:30px;opacity:.8}
+  .cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}
+  .cloud:before{width:48px;height:48px;left:18px;bottom:4px}
+  .cloud:after{width:60px;height:60px;right:16px;bottom:2px}
+  .c1{left:6vw;top:9vh}.c2{left:58vw;top:16vh;transform:scale(.6)}
+  .flower{position:absolute;font-size:36px;opacity:.9;pointer-events:none}
+  #hud{position:absolute;z-index:20;left:0;right:0;top:0;padding:max(10px,env(safe-area-inset-top)) 16px 0;
+    display:flex;justify-content:center;align-items:center;gap:6px;pointer-events:none;font-size:22px;
+    filter:drop-shadow(0 2px 4px #0002)}
+  #hud span{transition:transform .3s;display:inline-block}
+  #hud span.pop-in{animation:stickerPop .4s ease-out}
+  @keyframes stickerPop{0%{transform:scale(0)}60%{transform:scale(1.3)}100%{transform:scale(1)}}
+  #parentBtns{position:absolute;z-index:25;top:max(10px,env(safe-area-inset-top));right:14px;
+    display:flex;gap:8px}
+  #soundBtn,#fsBtn,#homeBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+    font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
+  #homeBtnLang{position:absolute;top:max(14px,env(safe-area-inset-top));left:14px;width:40px;height:40px;
+    border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:18px;box-shadow:0 4px 14px #0002;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;cursor:pointer;opacity:.8}
+  .balloon{position:absolute;width:120px;height:120px;z-index:10;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;will-change:transform;left:0;top:0}
+  .balloon .visual{width:90px;height:90px;border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #ffffff88 0%, transparent 45%);
+    filter:drop-shadow(0 6px 5px #0003);transition:transform .15s}
+  .balloon .emoji{position:absolute;font-size:44px;pointer-events:none;text-shadow:0 3px 6px #0003}
+  .pop{position:absolute;z-index:30;font-weight:900;font-size:26px;color:#5a3b20;text-shadow:0 1px 0 #fff,0 2px 5px #0003;
+    animation:pop .6s ease-out forwards;pointer-events:none;white-space:nowrap}
+  @keyframes pop{0%{transform:scale(.5) translateY(0);opacity:0}25%{transform:scale(1.3) translateY(0);opacity:1}100%{transform:scale(1) translateY(-55px);opacity:0}}
+  #hint{position:absolute;z-index:15;bottom:max(18px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+    background:rgba(255,255,255,.86);padding:9px 16px;border-radius:999px;color:#5a3b20;font-weight:700;
+    font-size:15px;white-space:nowrap;box-shadow:0 3px 12px #0002;transition:opacity .5s}
+  #langScreen{position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,#ffe3d0 0%,#ffd6a8 60%,#bfe8a0 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #langScreen .lang-title{font-size:clamp(24px,6vw,34px);font-weight:900;color:#5a3b20;margin:0 0 6px}
+  #langScreen .lang-sub{font-size:16px;color:#7a5930;opacity:.85;margin:0 0 32px}
+  #langBtns{display:flex;flex-direction:column;gap:16px;width:min(280px,78vw)}
+  .langBtn{padding:18px;font-size:20px;font-weight:800;border:none;border-radius:20px;cursor:pointer;
+    background:#fff;color:#5a3b20;box-shadow:0 6px 18px #0002;display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:transform .15s}
+  .langBtn:active{transform:scale(.96)}
+  .langBtn .flag{font-size:26px}
+  #langBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:18px;
+    box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.55}
+</style>
+</head>
+<body>
+<div id="game">
+  <div class="sun"></div><div class="cloud c1"></div><div class="cloud c2"></div>
+  <div class="flower" style="left:7%;bottom:6%">🌼</div>
+  <div class="flower" style="left:84%;bottom:9%">🌷</div>
+  <div class="flower" style="left:48%;bottom:4%">🌻</div>
+  <div id="hud"></div>
+  <div id="parentBtns">
+    <a id="homeBtn" href="../" aria-label="Back to games">🏠</a>
+    <button id="langBtn" aria-label="Change language">🌐</button>
+    <button id="fsBtn" aria-label="Fullscreen">⛶</button>
+    <button id="soundBtn" aria-label="Toggle sound">🔊</button>
+  </div>
+  <div id="hint">👆 Tap a color!</div>
+</div>
+<div id="langScreen">
+  <a id="homeBtnLang" href="../" aria-label="Back to games">🏠</a>
+  <div class="lang-title">🎨 Alana's Color Garden</div>
+  <div class="lang-sub" data-key="pick">Pilih bahasa / Choose language</div>
+  <div id="langBtns">
+    <button class="langBtn" data-lang="id"><span class="flag">🇮🇩</span> Bahasa Indonesia</button>
+    <button class="langBtn" data-lang="en"><span class="flag">🇺🇸</span> English</button>
+  </div>
+</div>
+<script>
+(() => {
+  const game=document.getElementById('game'), hud=document.getElementById('hud'),
+        soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
+        langBtn=document.getElementById('langBtn'), langScreen=document.getElementById('langScreen'),
+        hint=document.getElementById('hint');
+  let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false;
+  let tapsSinceSticker=0;
+  let lang='id', started=false;
+  const LANG={
+    id:{ langTag:'id-ID', hint:'👆 Ketuk warnanya!', pick:'Pilih bahasa' },
+    en:{ langTag:'en-US', hint:'👆 Tap a color!',   pick:'Choose language' }
+  };
+  const colors=[
+    {key:'merah', name:{id:'Merah', en:'Red'},    emoji:'🔴', color:'#ff5d5d'},
+    {key:'biru',  name:{id:'Biru',  en:'Blue'},   emoji:'🔵', color:'#4d9bff'},
+    {key:'hijau', name:{id:'Hijau', en:'Green'},  emoji:'🟢', color:'#4cc45c'},
+    {key:'kuning',name:{id:'Kuning',en:'Yellow'}, emoji:'🟡', color:'#ffd43b'},
+    {key:'oranye',name:{id:'Oranye',en:'Orange'}, emoji:'🟠', color:'#ff9436'},
+    {key:'ungu',  name:{id:'Ungu',  en:'Purple'}, emoji:'🟣', color:'#a86cff'},
+  ];
+  const active=new Set();
+
+  function addSticker(emoji){
+    const s=document.createElement('span'); s.textContent=emoji; s.className='pop-in';
+    hud.appendChild(s);
+    if(hud.children.length>10) hud.removeChild(hud.firstChild);
+  }
+
+  /* ---------- sound effects ---------- */
+  function sound(freq,dur=.07,type='sine',vol=.045){
+    if(!musicOn) return;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      o.frequency.value=freq; o.type=type; g.gain.setValueAtTime(vol,audioCtx.currentTime);
+      g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);
+      o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur);
+    }catch(e){}
+  }
+
+  /* Cheerful little rising 3-note giggle whenever a color is tapped. */
+  function chime(){
+    if(!musicOn) return;
+    const notes=[440+Math.random()*80, 560+Math.random()*80, 700+Math.random()*80];
+    notes.forEach((f,i)=>setTimeout(()=>sound(f,0.1,'sine',0.04), i*55));
+  }
+
+  /* Gently speaks the color's name in the chosen language — a small, optional */
+  /* educational touch. Falls back silently if speech isn't supported. */
+  function warmUpSpeech(){
+    try{
+      if(!('speechSynthesis' in window)) return;
+      speechSynthesis.getVoices();
+      if(!('onvoiceschanged' in speechSynthesis)) return;
+      speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();
+      if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel();
+      const warm=new SpeechSynthesisUtterance(' ');
+      warm.volume=0; warm.rate=1;
+      speechSynthesis.speak(warm);
+      speechSynthesis.cancel();
+    }catch(e){}
+  }
+  function speakName(name){
+    if(!musicOn) return;
+    try{
+      if(!('speechSynthesis' in window)) return;
+      const u=new SpeechSynthesisUtterance(name);
+      u.lang=LANG[lang].langTag; u.rate=0.85; u.pitch=1.15; u.volume=0.8;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+      if(speechSynthesis.getVoices().length===0){
+        setTimeout(()=>{
+          speechSynthesis.cancel();
+          if('speechSynthesis' in window) speechSynthesis.speak(u);
+        },300);
+      }
+    }catch(e){}
+  }
+
+  /* ---------- generative, royalty-free background music ---------- */
+  let musicGain=null, nextNoteTime=0;
+  const scale=[261.63,293.66,329.63,392.00,440.00,523.25,587.33,659.25];
+  let beat=0;
+
+  function initMusic(){
+    if(musicStarted) return;
+    musicStarted=true;
+    try{
+      audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+      musicGain=audioCtx.createGain();
+      musicGain.gain.value=musicOn?0.09:0;
+      const filter=audioCtx.createBiquadFilter();
+      filter.type='lowpass'; filter.frequency.value=2200;
+      musicGain.connect(filter); filter.connect(audioCtx.destination);
+      nextNoteTime=audioCtx.currentTime+0.1;
+      scheduler();
+    }catch(e){}
+  }
+
+  function playNote(freq,time,dur,type,vol){
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(0,time);
+    g.gain.linearRampToValueAtTime(vol,time+0.04);
+    g.gain.exponentialRampToValueAtTime(0.0005,time+dur);
+    o.connect(g); g.connect(musicGain);
+    o.start(time); o.stop(time+dur+0.05);
+  }
+
+  function scheduleBeat(){
+    const t=nextNoteTime;
+    if(beat%4===0){
+      const root=scale[0]/2;
+      playNote(root,t,1.8,'triangle',0.5);
+      playNote(root*1.5,t,1.8,'triangle',0.35);
+    }
+    if(Math.random()<0.8){
+      const note=scale[Math.floor(Math.random()*scale.length)];
+      playNote(note,t+(Math.random()<0.3?0.2:0),0.9,'sine',0.55);
+    }
+    beat++;
+    nextNoteTime+=0.85;
+  }
+
+  function scheduler(){
+    if(!audioCtx) return;
+    while(nextNoteTime<audioCtx.currentTime+0.6){ scheduleBeat(); }
+    setTimeout(scheduler,150);
+  }
+
+  function setMusicEnabled(on){
+    musicOn=on;
+    soundBtn.textContent=on?'🔊':'🔇';
+    if(musicGain) musicGain.gain.setTargetAtTime(on?0.09:0, audioCtx.currentTime, 0.15);
+    if(!on){ try{speechSynthesis.cancel();}catch(e){} }
+  }
+
+  soundBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    initMusic();
+    if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+    setMusicEnabled(!musicOn);
+  });
+
+  /* ---------- fullscreen / kiosk mode ---------- */
+  function goFullscreen(){
+    try{
+      const el=document.documentElement;
+      if(!document.fullscreenElement && el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+    }catch(e){}
+  }
+  function updateFsBtn(){ fsBtn.textContent = document.fullscreenElement ? '✕' : '⛶'; }
+  fsBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    if(document.fullscreenElement){ try{document.exitFullscreen();}catch(err){} }
+    else goFullscreen();
+  });
+  document.querySelectorAll('#homeBtn,#homeBtnLang').forEach(b=>b.addEventListener('pointerdown',e=>e.stopPropagation()));
+  document.addEventListener('fullscreenchange',updateFsBtn);
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden && audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+  });
+
+  /* ---------- gameplay ---------- */
+  function spawn(){
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    const el=document.createElement('div'); el.className='balloon';
+    el.dataset.key=col.key;
+    el.innerHTML=`<div class="visual" style="background-color:${col.color}"></div>
+      <div class="emoji">${col.emoji}</div>`;
+    const w=innerWidth,h=innerHeight;
+    const x=4+Math.random()*(w-124), y=Math.max(h*.14,50)+Math.random()*(h*.72-120);
+    el.dataset.x=x; el.dataset.y=y; el.dataset.sc=1;
+    el.dataset.vx=(Math.random()-.5)*0.5; el.dataset.vy=(Math.random()-.5)*0.32;
+    moveEl(el,Math.round(x),Math.round(y));
+    el.addEventListener('pointerdown',e=>{
+      e.preventDefault(); e.stopPropagation();
+      if(!started || !active.has(el)) return;
+      initMusic();
+      if(audioCtx && audioCtx.state==='suspended') audioCtx.resume();
+      active.delete(el);
+      const visual=el.querySelector('.visual');
+      visual.style.transform='scale(1.3)';
+      const name=col.name[lang];
+      chime();
+      speakName(name);
+      tapsSinceSticker++;
+      if(tapsSinceSticker>=3){ addSticker(col.emoji); tapsSinceSticker=0; }
+      pop(el.dataset.x,el.dataset.y,name);
+      setTimeout(()=>el.remove(),120);
+    },{passive:false});
+    game.appendChild(el); active.add(el);
+  }
+  function pop(x,y,name){
+    const p=document.createElement('div');p.className='pop';p.textContent='✨ '+name;
+    p.style.left=x+'px';p.style.top=y+'px';game.appendChild(p);
+    setTimeout(()=>p.remove(),620);
+  }
+  function moveEl(el,x,y){
+    el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
+  }
+  function loop(t){
+    if(started && t-lastSpawn>1000 && active.size<6){spawn();lastSpawn=t;}
+    active.forEach(el=>{
+      let x=parseFloat(el.dataset.x)+parseFloat(el.dataset.vx);
+      let y=parseFloat(el.dataset.y)+parseFloat(el.dataset.vy);
+      const maxX=innerWidth-124,maxY=innerHeight*.86-50,minY=innerHeight*.12;
+      if(x<4||x>maxX) el.dataset.vx=(-parseFloat(el.dataset.vx));
+      if(y<minY||y>maxY) el.dataset.vy=(-parseFloat(el.dataset.vy));
+      x=Math.max(4,Math.min(maxX,x)); y=Math.max(minY,Math.min(maxY,y));
+      el.dataset.x=x;el.dataset.y=y;
+      moveEl(el,Math.round(x),Math.round(y));
+    });
+    requestAnimationFrame(loop);
+  }
+  game.addEventListener('pointerdown',()=>{ if(!started)return; initMusic(); goFullscreen(); if(audioCtx && audioCtx.state==='suspended') audioCtx.resume(); sound(260,.035); },{passive:true});
+  requestAnimationFrame(loop);
+
+  /* ---------- language selection ---------- */
+  function selectLang(code){
+    lang=code;
+    started=true;
+    const L=LANG[code];
+    hint.textContent=L.hint;
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=L.pick);
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=true);
+    langScreen.style.display='none';
+    hint.style.opacity='1';
+    setTimeout(()=>hint.style.opacity='0',3500);
+    setTimeout(warmUpSpeech,600);
+    lastSpawn=performance.now();
+    for(let i=0;i<3;i++) setTimeout(spawn,i*450);
+  }
+  langScreen.querySelectorAll('.langBtn').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{
+      e.stopPropagation();
+      document.querySelector('.langBtn').focus();
+      selectLang(b.dataset.lang);
+    },{passive:true});
+  });
+  langBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    document.querySelector('.langBtn').focus();
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=LANG[lang].pick);
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=false);
+    langScreen.style.display='flex';
+    hint.style.opacity='0';
+  },{passive:true});
+
+  /* ---------- PWA service worker ---------- */
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+})();
+</script>
+</body>
+</html>

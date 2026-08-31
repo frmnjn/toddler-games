@@ -38,6 +38,12 @@ games/
     ├── icon-192.png
     ├── icon-512.png
     └── assets/       # 9 suara binatang CC0 + 9 gambar (lihat SOURCES.txt)
+└── color-garden/     # "Alana's Color Garden"
+    ├── index.html    # Game: tap warna, muncul & ucap nama warnanya (ID/EN)
+    ├── manifest.json # PWA manifest
+    ├── sw.js         # Service worker (offline / cache)
+    ├── icon-192.png
+    └── icon-512.png
 ```
 
 ## Cara deploy
@@ -85,9 +91,18 @@ Taman hewan yang ramai: 9 hewan asli (kucing, anjing, ayam jago, sapi, bebek, ku
 - Ada hewan ukuran **besar** (langka) dengan suara lebih keras.
 - Musik latar digenerate di browser (bebas lisensi).
 
+### Alana's Color Garden (`color-garden/`)
+
+Taman warna-warni: 6 balon warna (merah, biru, hijau, kuning, oranye, ungu) mengambang pelan; tap → balon "pop" dan **mengucapkan nama warnanya**.
+
+- **Pilih bahasa dulu** di awal: 🇮🇩 Bahasa Indonesia atau 🇺🇸 English.
+  - Nama warna yang diucapkan & ditampilkan ikut bahasa (`id-ID`/`en-US`). Tombol **🌐** untuk ganti kapan saja.
+- Tanpa skor / angka — fokus sebab-akibat + pengenalan warna untuk anak.
+- Musik latar & efek digenerate di browser (bebas lisensi).
+
 ## PWA & offline
 
-Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **network-first untuk HTML + stale-while-revalidate untuk aset** dengan versi cache terpisah (`ant-garden-v2`, `shape-garden-v2`, `rain-garden-v3`, `animal-garden-v2`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
+Tiap game punya `manifest.json` (standalone, icons maskable) dan `sw.js` berstrategi **network-first untuk HTML + stale-while-revalidate untuk aset** dengan versi cache terpisah (`ant-garden-v2`, `shape-garden-v2`, `rain-garden-v3`, `animal-garden-v2`, `color-garden-v1`), jadi game bisa dipasang ke home screen dan tetap jalan saat offline.
 
 Halaman launcher (`index.html`) juga punya `manifest.json` + `sw.js` sendiri ("Alana's Games") sehingga halaman utama bisa di-install & offline. Konsep tetap **1 game = 1 app**.
 
