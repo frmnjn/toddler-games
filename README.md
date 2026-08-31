@@ -93,7 +93,7 @@ Taman hewan yang ramai: 9 hewan asli (kucing, anjing, ayam jago, sapi, bebek, ku
 
 ### Alana's Color Garden (`color-garden/`)
 
-Taman warna-warni: 6 balon warna (merah, biru, hijau, kuning, oranye, ungu) mengambang pelan; tap → balon "pop" dan **mengucapkan nama warnanya**.
+Taman warna-warni: 8 balon warna (merah, biru, hijau, kuning, oren, ungu, pink, coklat) mengambang pelan; tap → balon "pop" dan **mengucapkan nama warnanya**.
 
 - **Pilih bahasa dulu** di awal: 🇮🇩 Bahasa Indonesia atau 🇺🇸 English.
   - Nama warna yang diucapkan & ditampilkan ikut bahasa (`id-ID`/`en-US`). Tombol **🌐** untuk ganti kapan saja.
