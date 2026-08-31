@@ -65,6 +65,12 @@
   .langBtn .flag{font-size:26px}
   #langBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:18px;
     box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.55}
+  #lockBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+    font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
+  #parentBtns .lockable{transition:opacity .3s, transform .3s}
+  body.locked #parentBtns .lockable{opacity:0;transform:scale(.6);pointer-events:none}
+  body.locked #lockBtn{opacity:.9}
 </style>
 </head>
 <body>
@@ -75,10 +81,11 @@
   <div class="flower" style="left:48%;bottom:4%">🌻</div>
   <div id="hud"></div>
   <div id="parentBtns">
-    <a id="homeBtn" href="../" aria-label="Back to games">🏠</a>
-    <button id="langBtn" aria-label="Change language">🌐</button>
-    <button id="fsBtn" aria-label="Fullscreen">⛶</button>
-    <button id="soundBtn" aria-label="Toggle sound">🔊</button>
+    <a id="homeBtn" class="lockable" href="../" aria-label="Back to games">🏠</a>
+    <button id="langBtn" class="lockable" aria-label="Change language">🌐</button>
+    <button id="fsBtn" class="lockable" aria-label="Fullscreen">⛶</button>
+    <button id="soundBtn" class="lockable" aria-label="Toggle sound">🔊</button>
+    <button id="lockBtn" aria-label="Parent lock">🔓</button>
   </div>
   <div id="hint">👆 Tap a color!</div>
 </div>
@@ -96,7 +103,7 @@
   const game=document.getElementById('game'), hud=document.getElementById('hud'),
         soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
         langBtn=document.getElementById('langBtn'), langScreen=document.getElementById('langScreen'),
-        hint=document.getElementById('hint');
+        lockBtn=document.getElementById('lockBtn'), hint=document.getElementById('hint');
   let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false;
   let tapsSinceSticker=0;
   let lang='id', started=false;
@@ -342,6 +349,29 @@
     langScreen.style.display='flex';
     hint.style.opacity='0';
   },{passive:true});
+
+  /* ---------- parent lock ---------- */
+  let locked=localStorage.getItem('color-lock')==='1';
+  function applyLock(){
+    document.body.classList.toggle('locked',locked);
+    lockBtn.textContent=locked?'🔒':'🔓';
+  }
+  let lockTimer=null, lockLong=false;
+  function setLocked(on){
+    locked=on;
+    localStorage.setItem('color-lock',locked?'1':'0');
+    applyLock();
+  }
+  lockBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    lockLong=false;
+    lockTimer=setTimeout(()=>{ lockLong=true; setLocked(false); },1500);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>lockBtn.addEventListener(ev,e=>{
+    clearTimeout(lockTimer);
+    if(!lockLong) setLocked(true);
+  }));
+  applyLock();
 
   /* ---------- PWA service worker ---------- */
   if('serviceWorker' in navigator){

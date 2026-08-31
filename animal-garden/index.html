@@ -55,6 +55,27 @@
   @keyframes drift{from{transform:translateX(-18vw) scale(var(--sc,1))}to{transform:translateX(118vw) scale(var(--sc,1))}}
   .cloud{animation:drift linear infinite}
   .c1{--sc:1;animation-duration:28s}.c2{--sc:.7;animation-duration:36s}
+  #lockBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;
+    font-size:18px;box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;opacity:.55;text-decoration:none;color:inherit}
+  #parentBtns .lockable{transition:opacity .3s, transform .3s}
+  body.locked #parentBtns .lockable{opacity:0;transform:scale(.6);pointer-events:none}
+  body.locked #lockBtn{opacity:.9}
+  #homeBtnLang{position:absolute;top:max(14px,env(safe-area-inset-top));left:14px;width:40px;height:40px;
+    border-radius:50%;background:rgba(255,255,255,.92);border:none;font-size:18px;box-shadow:0 4px 14px #0002;
+    display:flex;align-items:center;justify-content:center;text-decoration:none;color:inherit;cursor:pointer;opacity:.8}
+  #langScreen{position:fixed;inset:0;z-index:40;background:linear-gradient(180deg,#bfe6f5 0%,#dfe9b8 55%,#94d16f 100%);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #langScreen .lang-title{font-size:clamp(24px,6vw,34px);font-weight:900;color:#3c6e2e;margin:0 0 6px}
+  #langScreen .lang-sub{font-size:16px;color:#3c6e2e;opacity:.85;margin:0 0 32px}
+  #langBtns{display:flex;flex-direction:column;gap:16px;width:min(280px,78vw)}
+  .langBtn{padding:18px;font-size:20px;font-weight:800;border:none;border-radius:20px;cursor:pointer;
+    background:#fff;color:#3c6e2e;box-shadow:0 6px 18px #0002;display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:transform .15s}
+  .langBtn:active{transform:scale(.96)}
+  .langBtn .flag{font-size:26px}
+  #langBtn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:18px;
+    box-shadow:0 4px 14px #0002;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:.55}
 </style>
 </head>
 <body>
@@ -64,19 +85,36 @@
   <div id="ground"></div>
   <div id="hud"></div>
   <div id="parentBtns">
-    <a id="homeBtn" href="../" aria-label="Back to games">🏠</a>
-    <button id="fsBtn" aria-label="Fullscreen">⛶</button>
-    <button id="soundBtn" aria-label="Toggle sound">🔊</button>
+    <a id="homeBtn" class="lockable" href="../" aria-label="Back to games">🏠</a>
+    <button id="langBtn" class="lockable" aria-label="Change language">🌐</button>
+    <button id="fsBtn" class="lockable" aria-label="Fullscreen">⛶</button>
+    <button id="soundBtn" class="lockable" aria-label="Toggle sound">🔊</button>
+    <button id="lockBtn" aria-label="Parent lock">🔓</button>
   </div>
   <div id="hint">👆 Ketuk binatangnya!</div>
+</div>
+<div id="langScreen">
+  <a id="homeBtnLang" href="../" aria-label="Back to games">🏠</a>
+  <div class="lang-title">🐾 Alana's Animal Garden</div>
+  <div class="lang-sub" data-key="pick">Pilih bahasa / Choose language</div>
+  <div id="langBtns">
+    <button class="langBtn" data-lang="id"><span class="flag">🇮🇩</span> Bahasa Indonesia</button>
+    <button class="langBtn" data-lang="en"><span class="flag">🇺🇸</span> English</button>
+  </div>
 </div>
 <script>
 (() => {
   const game=document.getElementById('game'), hud=document.getElementById('hud'),
         soundBtn=document.getElementById('soundBtn'), fsBtn=document.getElementById('fsBtn'),
-        hint=document.getElementById('hint');
+        langBtn=document.getElementById('langBtn'), lockBtn=document.getElementById('lockBtn'),
+        langScreen=document.getElementById('langScreen'), hint=document.getElementById('hint');
   let lastSpawn=0, audioCtx=null, musicOn=true, musicStarted=false;
-  let tapsSinceSticker=0, started=true;
+  let tapsSinceSticker=0, started=false;
+  let lang='id';
+  const LANG={
+    id:{ hint:'👆 Ketuk binatangnya!' },
+    en:{ hint:'👆 Tap the animals!' }
+  };
   const stickers=['🐱','🐶','🐓','🐮','🦆','🐴','🐑','🦉','🐦'];
   const active=new Set();
 
@@ -293,7 +331,7 @@
     el.style.transform='translate3d('+x+'px,'+y+'px,0) scale('+(el.dataset.sc||1)+')';
   }
   function loop(t){
-    if(t-lastSpawn>1050 && active.size<6){ spawn(); lastSpawn=t; }
+    if(started && t-lastSpawn>1050 && active.size<6){ spawn(); lastSpawn=t; }
     const w=innerWidth,h=innerHeight;
     active.forEach(el=>{
       let x=parseFloat(el.dataset.x)+parseFloat(el.dataset.vx);
@@ -319,7 +357,57 @@
   hint.style.opacity='1';
   setTimeout(()=>hint.style.opacity='0',3500);
 
-  for(let i=0;i<3;i++) setTimeout(spawn,i*420);
+  /* ---------- language selection (hint only, no speech) ---------- */
+  function selectLang(code){
+    lang=code;
+    started=true;
+    hint.textContent=LANG[code].hint;
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=(code==='id'?'Pilih bahasa':'Choose language'));
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=true);
+    langScreen.style.display='none';
+    hint.style.opacity='1';
+    setTimeout(()=>hint.style.opacity='0',3500);
+    lastSpawn=performance.now();
+    for(let i=0;i<3;i++) setTimeout(spawn,i*420);
+  }
+  langScreen.querySelectorAll('.langBtn').forEach(b=>{
+    b.addEventListener('pointerdown',e=>{
+      e.stopPropagation();
+      document.querySelector('.langBtn').focus();
+      selectLang(b.dataset.lang);
+    },{passive:true});
+  });
+  langBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    document.querySelector('.langBtn').focus();
+    document.querySelectorAll('[data-key="pick"]').forEach(el=>el.textContent=(lang==='id'?'Pilih bahasa':'Choose language'));
+    langScreen.querySelectorAll('.langBtn').forEach(b=>b.disabled=false);
+    langScreen.style.display='flex';
+    hint.style.opacity='0';
+  },{passive:true});
+
+  /* ---------- parent lock ---------- */
+  let locked=localStorage.getItem('animal-lock')==='1';
+  function applyLock(){
+    document.body.classList.toggle('locked',locked);
+    lockBtn.textContent=locked?'🔒':'🔓';
+  }
+  let lockTimer=null, lockLong=false;
+  function setLocked(on){
+    locked=on;
+    localStorage.setItem('animal-lock',locked?'1':'0');
+    applyLock();
+  }
+  lockBtn.addEventListener('pointerdown',e=>{
+    e.stopPropagation();
+    lockLong=false;
+    lockTimer=setTimeout(()=>{ lockLong=true; setLocked(false); },1500);
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>lockBtn.addEventListener(ev,e=>{
+    clearTimeout(lockTimer);
+    if(!lockLong) setLocked(true);
+  }));
+  applyLock();
 
   /* ---------- PWA service worker ---------- */
   if('serviceWorker' in navigator){
